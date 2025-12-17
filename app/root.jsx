@@ -17,6 +17,9 @@ import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from '~/components/PageLayout';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 
+import './lib/fontawesome';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
  * @type {ShouldRevalidateFunction}
