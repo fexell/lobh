@@ -49,13 +49,10 @@ function CartEmpty({hidden = false}) {
   return (
     <div hidden={hidden}>
       <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
-      </p>
+      <p>Ser ut som om du inte har lagt till något än, låt oss börja!</p>
       <br />
       <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
+        Fortsätt handla →
       </Link>
     </div>
   );
