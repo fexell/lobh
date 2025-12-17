@@ -7,7 +7,7 @@
   "scripts": {
     "build": "remix vite:build",
     "codegen": "shopify hydrogen codegen",
-    "dev": "shopify hydrogen dev --codegen",
+    "dev": "shopify hydrogen dev --codegen --host",
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js,.ts,.jsx,.tsx .",
     "preview": "netlify serve"
   },
