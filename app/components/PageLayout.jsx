@@ -1,5 +1,5 @@
-import {Await, Link} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Await, Link} from 'react-router-dom';
+import {Suspense, useId} from 'react';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
@@ -9,6 +9,7 @@ import {
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
+import { MyMobileMenu } from './MobileMenu';
 
 /**
  * @param {PageLayoutProps}
@@ -25,16 +26,28 @@ export function PageLayout({
     <Aside.Provider>
       <CartAside cart={cart} />
       <SearchAside />
-      <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
+      <Aside type="mobile">
+        <MyMobileMenu header={header} publicStoreDomain={publicStoreDomain} primaryDomainUrl={header.shop.primaryDomain.url} />
+      </Aside>
       {header && (
-        <Header
-          header={header}
-          cart={cart}
-          isLoggedIn={isLoggedIn}
-          publicStoreDomain={publicStoreDomain}
-        />
+        <Suspense fallback={null}>
+          <Await resolve={cart}>
+            {(cartData) => (
+            <Header
+              header={header}
+              cart={cartData}
+              isLoggedIn={isLoggedIn}
+              publicStoreDomain={publicStoreDomain}
+            />
+            )}
+          </Await>
+        </Suspense>
       )}
-      <main>{children}</main>
+      <main className="flex flex-col items-center py-4">
+        <div className="lg:w-5xl">
+          {children}
+        </div>
+      </main>
       <Footer
         footer={footer}
         header={header}
@@ -49,7 +62,7 @@ export function PageLayout({
  */
 function CartAside({cart}) {
   return (
-    <Aside type="cart" heading="CART">
+    <Aside type="cart" heading="KUNDVAGN">
       <Suspense fallback={<p>Loading cart ...</p>}>
         <Await resolve={cart}>
           {(cart) => {
@@ -62,6 +75,7 @@ function CartAside({cart}) {
 }
 
 function SearchAside() {
+  const queriesDatalistId = useId();
   return (
     <Aside type="search" heading="SEARCH">
       <div className="predictive-search">
@@ -76,6 +90,7 @@ function SearchAside() {
                 placeholder="Search"
                 ref={inputRef}
                 type="search"
+                list={queriesDatalistId}
               />
               &nbsp;
               <button onClick={goToSearch}>Search</button>
@@ -84,7 +99,7 @@ function SearchAside() {
         </SearchFormPredictive>
 
         <SearchResultsPredictive>
-          {({items, total, term, state, inputRef, closeSearch}) => {
+          {({items, total, term, state, closeSearch}) => {
             const {articles, collections, pages, products, queries} = items;
 
             if (state === 'loading' && term.current) {
@@ -99,7 +114,7 @@ function SearchAside() {
               <>
                 <SearchResultsPredictive.Queries
                   queries={queries}
-                  inputRef={inputRef}
+                  queriesDatalistId={queriesDatalistId}
                 />
                 <SearchResultsPredictive.Products
                   products={products}

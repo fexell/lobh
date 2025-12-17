@@ -1,4 +1,4 @@
-import {Link, useFetcher} from '@remix-run/react';
+import {Link, useFetcher} from 'react-router-dom';
 import {Image, Money} from '@shopify/hydrogen';
 import React, {useRef, useEffect} from 'react';
 import {
@@ -102,7 +102,7 @@ function SearchResultsPredictiveCollections({term, collections, closeSearch}) {
       <h5>Collections</h5>
       <ul>
         {collections.map((collection) => {
-          const colllectionUrl = urlWithTrackingParams({
+          const collectionUrl = urlWithTrackingParams({
             baseUrl: `/collections/${collection.handle}`,
             trackingParams: collection.trackingParameters,
             term: term.current,
@@ -110,7 +110,7 @@ function SearchResultsPredictiveCollections({term, collections, closeSearch}) {
 
           return (
             <li className="predictive-search-result-item" key={collection.id}>
-              <Link onClick={closeSearch} to={colllectionUrl}>
+              <Link onClick={closeSearch} to={collectionUrl}>
                 {collection.image?.url && (
                   <Image
                     alt={collection.image.altText ?? ''}
@@ -180,7 +180,8 @@ function SearchResultsPredictiveProducts({term, products, closeSearch}) {
             term: term.current,
           });
 
-          const image = product?.variants?.nodes?.[0].image;
+          const price = product?.selectedOrFirstAvailableVariant?.price;
+          const image = product?.selectedOrFirstAvailableVariant?.image;
           return (
             <li className="predictive-search-result-item" key={product.id}>
               <Link to={productUrl} onClick={closeSearch}>
@@ -194,11 +195,7 @@ function SearchResultsPredictiveProducts({term, products, closeSearch}) {
                 )}
                 <div>
                   <p>{product.title}</p>
-                  <small>
-                    {product?.variants?.nodes?.[0].price && (
-                      <Money data={product.variants.nodes[0].price} />
-                    )}
-                  </small>
+                  <small>{price && <Money data={price} />}</small>
                 </div>
               </Link>
             </li>
@@ -210,36 +207,21 @@ function SearchResultsPredictiveProducts({term, products, closeSearch}) {
 }
 
 /**
- * @param {PartialPredictiveSearchResult<'queries', 'inputRef'>}
+ * @param {PartialPredictiveSearchResult<'queries', never> & {
+ *   queriesDatalistId: string;
+ * }}
  */
-function SearchResultsPredictiveQueries({queries, inputRef}) {
+function SearchResultsPredictiveQueries({queries, queriesDatalistId}) {
   if (!queries.length) return null;
 
   return (
-    <div className="predictive-search-result" key="queries">
-      <h5>Queries</h5>
-      <ul>
-        {queries.map((suggestion) => {
-          if (!suggestion) return null;
+    <datalist id={queriesDatalistId}>
+      {queries.map((suggestion) => {
+        if (!suggestion) return null;
 
-          return (
-            <li className="predictive-search-result-item" key={suggestion.text}>
-              <div
-                role="presentation"
-                onClick={() => {
-                  if (!inputRef.current) return;
-                  inputRef.current.value = suggestion.text;
-                  inputRef.current.focus();
-                }}
-                dangerouslySetInnerHTML={{
-                  __html: suggestion?.styledText,
-                }}
-              />
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+        return <option key={suggestion.text} value={suggestion.text} />;
+      })}
+    </datalist>
   );
 }
 
@@ -321,5 +303,5 @@ function usePredictiveSearch() {
  * }} SearchResultsPredictiveProps
  */
 
-/** @template T @typedef {import('@remix-run/react').Fetcher<T>} Fetcher */
+/** @template T @typedef {import('react-router').Fetcher<T>} Fetcher */
 /** @typedef {import('~/lib/search').PredictiveSearchReturn} PredictiveSearchReturn */

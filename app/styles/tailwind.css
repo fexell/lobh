@@ -1,0 +1,12 @@
+/**
+ * Configure Tailwind v4 in this file using CSS variables and directives:
+ * https://tailwindcss.com/docs/v4-beta#css-first-configuration
+ */
+
+@import 'tailwindcss';
+
+@theme {
+  --color-light-blue: #7AC9EF;
+  --color-blue: #2D8FC7;
+  --color-dark-blue: #002B6A;
+}

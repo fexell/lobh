@@ -1,6 +1,6 @@
 import {CartForm, Image} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
-import {Link} from '@remix-run/react';
+import {Link} from 'react-router-dom';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
 
@@ -75,9 +75,10 @@ function CartLineQuantity({line}) {
 
   return (
     <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
+      <small>Kvantitet: {quantity} &nbsp;&nbsp;</small>
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
         <button
+          className="cursor-pointer"
           aria-label="Decrease quantity"
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
@@ -89,6 +90,7 @@ function CartLineQuantity({line}) {
       &nbsp;
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
+          className="cursor-pointer"
           aria-label="Increase quantity"
           name="increase-quantity"
           value={nextQuantity}
@@ -115,12 +117,13 @@ function CartLineQuantity({line}) {
 function CartLineRemoveButton({lineIds, disabled}) {
   return (
     <CartForm
+      fetcherKey={getUpdateKey(lineIds)}
       route="/cart"
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button disabled={disabled} type="submit">
-        Remove
+      <button className="text-red-600 cursor-pointer" disabled={disabled} type="submit">
+        Ta bort
       </button>
     </CartForm>
   );
@@ -133,8 +136,11 @@ function CartLineRemoveButton({lineIds, disabled}) {
  * }}
  */
 function CartLineUpdateButton({children, lines}) {
+  const lineIds = lines.map((line) => line.id);
+
   return (
     <CartForm
+      fetcherKey={getUpdateKey(lineIds)}
       route="/cart"
       action={CartForm.ACTIONS.LinesUpdate}
       inputs={{lines}}
@@ -142,6 +148,17 @@ function CartLineUpdateButton({children, lines}) {
       {children}
     </CartForm>
   );
+}
+
+/**
+ * Returns a unique key for the update action. This is used to make sure actions modifying the same line
+ * items are not run concurrently, but cancel each other. For example, if the user clicks "Increase quantity"
+ * and "Decrease quantity" in rapid succession, the actions will cancel each other and only the last one will run.
+ * @returns
+ * @param {string[]} lineIds - line ids affected by the update
+ */
+function getUpdateKey(lineIds) {
+  return [CartForm.ACTIONS.LinesUpdate, ...lineIds].join('-');
 }
 
 /** @typedef {OptimisticCartLine<CartApiQueryFragment>} CartLine */

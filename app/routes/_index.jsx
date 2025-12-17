@@ -2,6 +2,38 @@ import {defer} from '@netlify/remix-runtime';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
+import { useVariantUrl } from '~/lib/variants';
+import Banner1 from '../assets/banner-1.jpg';
+
+const BEST_SELLING_PRODUCT_QUERY = `#graphql
+  fragment BestSellingProduct on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+  }
+
+  query BestSellingProduct ($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 1, sortKey: BEST_SELLING) {
+      nodes {
+        ...BestSellingProduct
+      }
+    }
+  }
+`;
 
 /**
  * @type {MetaFunction}
@@ -28,16 +60,18 @@ export async function loader(args) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  * @param {LoaderFunctionArgs}
  */
-async function loadCriticalData({context}) {
-  const [{collections}] = await Promise.all([
+async function loadCriticalData({ context }) {
+  const [{ collections }, { products }] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
+    context.storefront.query(BEST_SELLING_PRODUCT_QUERY),
   ]);
 
   return {
     featuredCollection: collections.nodes[0],
+    bestSellingProduct: products.nodes, // array with 1 item
   };
 }
+
 
 /**
  * Load data for rendering content below the fold. This data is deferred and will be
@@ -62,9 +96,24 @@ function loadDeferredData({context}) {
 export default function Homepage() {
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
+  const bestSellingProduct = data.bestSellingProduct || [];
+  const product = bestSellingProduct[0];
+
+  const variantUrl = bestSellingProduct[0]?.handle
+    ? useVariantUrl(bestSellingProduct[0].handle, [])
+    : '#';
+
+
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
+      {/* <FeaturedCollection collection={data.featuredCollection} /> */}
+      <div
+        className="relative flex flex-col h-96 justify-center items-end rounded-xl before:absolute before:inset-0 before:bg-light-blue/80 before:rounded-xl"
+        style={{ backgroundImage: `url(${Banner1})`, backgroundSize: 'cover' }}>
+        <Link className="relative inline-block w-full max-w-48 h-full max-h-fit mr-8" to={variantUrl}>
+          <Image aspectRatio='1/1' className="rounded-full! object-contain" data={product.featuredImage} size="100%" sizes="(min-width: 45em) 50vw, 100vw" />
+        </Link>
+      </div>
       <RecommendedProducts products={data.recommendedProducts} />
     </div>
   );

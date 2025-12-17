@@ -1,4 +1,4 @@
-import {useFetcher, useNavigate} from '@remix-run/react';
+import {useFetcher, useNavigate} from 'react-router-dom';
 import React, {useRef, useEffect} from 'react';
 import {useAside} from './Aside';
 
@@ -30,13 +30,13 @@ export function SearchFormPredictive({
   /** Navigate to the search page with the current input value */
   function goToSearch() {
     const term = inputRef?.current?.value;
-    navigate(SEARCH_ENDPOINT + (term ? `?q=${term}` : ''));
+    void navigate(SEARCH_ENDPOINT + (term ? `?q=${term}` : ''));
     aside.close();
   }
 
   /** Fetch search results based on the input value */
   function fetchResults(event) {
-    fetcher.submit(
+    void fetcher.submit(
       {q: event.target.value || '', limit: 5, predictive: true},
       {method: 'GET', action: SEARCH_ENDPOINT},
     );
@@ -73,6 +73,6 @@ export function SearchFormPredictive({
  * }} SearchFormPredictiveProps
  */
 
-/** @typedef {import('@remix-run/react').FormProps} FormProps */
-/** @template T @typedef {import('@remix-run/react').Fetcher<T>} Fetcher */
+/** @typedef {import('react-router').FormProps} FormProps */
+/** @template T @typedef {import('react-router').Fetcher<T>} Fetcher */
 /** @typedef {import('~/lib/search').PredictiveSearchReturn} PredictiveSearchReturn */

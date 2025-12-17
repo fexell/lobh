@@ -1,4 +1,4 @@
-import {Link} from '@remix-run/react';
+import {Link} from 'react-router-dom';
 import {Image, Money, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams} from '~/lib/search';
 
@@ -104,21 +104,18 @@ function SearchResultsProducts({term, products}) {
               term,
             });
 
+            const price = product?.selectedOrFirstAvailableVariant?.price;
+            const image = product?.selectedOrFirstAvailableVariant?.image;
+
             return (
               <div className="search-results-item" key={product.id}>
                 <Link prefetch="intent" to={productUrl}>
-                  {product.variants.nodes[0].image && (
-                    <Image
-                      data={product.variants.nodes[0].image}
-                      alt={product.title}
-                      width={50}
-                    />
+                  {image && (
+                    <Image data={image} alt={product.title} width={50} />
                   )}
                   <div>
                     <p>{product.title}</p>
-                    <small>
-                      <Money data={product.variants.nodes[0].price} />
-                    </small>
+                    <small>{price && <Money data={price} />}</small>
                   </div>
                 </Link>
               </div>
