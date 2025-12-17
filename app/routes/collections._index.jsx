@@ -52,10 +52,10 @@ export default function Collections() {
 
   return (
     <div className="collections">
-      <h1>Collections</h1>
+      <h1>Kollektioner</h1>
       <PaginatedResourceSection
         connection={collections}
-        resourcesClassName="collections-grid"
+        resourcesClassName="collections-grid flex flex-col"
       >
         {({node: collection, index}) => (
           <CollectionItem
@@ -78,7 +78,7 @@ export default function Collections() {
 function CollectionItem({collection, index}) {
   return (
     <Link
-      className="collection-item"
+      className="collection-item p-4 mb-4 rounded-lg hover:bg-light-blue"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
@@ -91,7 +91,7 @@ function CollectionItem({collection, index}) {
           loading={index < 3 ? 'eager' : undefined}
         />
       )}
-      <h5>{collection.title}</h5>
+      <h5 className="m-0! p-0!">{collection.title}</h5>
     </Link>
   );
 }

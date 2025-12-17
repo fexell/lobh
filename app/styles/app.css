@@ -389,9 +389,6 @@ button.reset:hover:not(:has(> *)) {
 * --------------------------------------------------
 */
 .collections-grid {
-  display: grid;
-  grid-gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-width), 1fr));
   margin-bottom: 2rem;
 }
 
