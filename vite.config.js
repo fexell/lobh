@@ -4,6 +4,7 @@ import {netlifyPlugin} from '@netlify/remix-edge-adapter/plugin';
 import {vitePlugin as remix} from '@remix-run/dev';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 export default defineConfig({
   plugins: [
@@ -38,6 +39,11 @@ export default defineConfig({
        * @see https://vitejs.dev/config/dep-optimization-options
        */
       include: [],
+    },
+  },
+  resolve: {
+    alias: {
+      '~': path.resolve(__dirname, 'app'),
     },
   },
 });
