@@ -108,7 +108,7 @@ export default function Homepage() {
     <div className="home">
       {/* <FeaturedCollection collection={data.featuredCollection} /> */}
       <div
-        className="relative flex flex-col h-96 justify-center items-end rounded-xl before:absolute before:inset-0 before:bg-light-blue/80 before:rounded-xl"
+        className="relative flex flex-col h-96 justify-center items-end mb-8 rounded-xl before:absolute before:inset-0 before:bg-light-blue/80 before:rounded-xl"
         style={{ backgroundImage: `url(${Banner1})`, backgroundSize: 'cover' }}>
         <Link className="relative inline-block w-full max-w-48 h-full max-h-fit mr-8" to={variantUrl}>
           <Image aspectRatio='1/1' className="rounded-full! object-contain" data={product.featuredImage} size="100%" sizes="(min-width: 45em) 50vw, 100vw" />
@@ -150,8 +150,8 @@ function FeaturedCollection({collection}) {
 function RecommendedProducts({products}) {
   return (
     <div className="recommended-products">
-      <h2>Recommended Products</h2>
-      <Suspense fallback={<div>Loading...</div>}>
+      <h2>Rekommenderade produkter</h2>
+      <Suspense fallback={<div>Laddar...</div>}>
         <Await resolve={products}>
           {(response) => (
             <div className="recommended-products-grid">
