@@ -30,14 +30,11 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap');
-
         .lc-header {
           font-family: 'Montserrat', sans-serif;
           position: sticky;
           top: 0;
-          z-index: 40;
-          width: 100%;
+          z-index: 100;
         }
 
         .lc-announcement {
@@ -55,7 +52,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
         .lc-announcement a {
           color: #7AC9EF;
           text-decoration: none;
-          border-bottom: 1px solid rgba(122, 201, 239, 0.4);
+          border-bottom: 1px solid rgba(201,184,122,0.4);
           transition: border-color 0.2s;
         }
 
@@ -367,6 +364,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           animation: fadeIn 0.2s ease;
         }
 
@@ -379,7 +377,6 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
           width: 100%;
           max-width: 640px;
           padding: 0 24px;
-          margin-top: 120px;
         }
 
         .lc-search-label {
@@ -410,6 +407,11 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
           color: #fff;
         }
 
+        /* Hide mobile-right on desktop */
+        .lc-mobile-right {
+          display: none;
+        }
+
         @media (max-width: 1024px) {
           .lc-nav-left,
           .lc-nav-right {
@@ -431,6 +433,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            gap: 4px;
           }
         }
       `}</style>
@@ -438,7 +441,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
       <header className="lc-header">
         {/* Announcement bar */}
         <div className="lc-announcement">
-          <a href="mailto:ljudochbildhornan@test.com">ljudochbildhornan@test.com</a>
+          <a href="/pages/contact">Kontakta teamet för personlig service</a>
         </div>
 
         {/* Main nav */}
@@ -521,7 +524,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
             </div>
 
             {/* Mobile right icons */}
-            <div className="lc-mobile-right" style={{display: 'none'}}>
+            <div className="lc-mobile-right">
               <button className="lc-icon-btn" onClick={() => setSearchOpen(true)}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
