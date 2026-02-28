@@ -18,8 +18,6 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
         {(footer) => (
           <>
             <style>{`
-              @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500;600&display=swap');
-
               .lc-footer {
                 font-family: 'Montserrat', sans-serif;
                 background: #111;
