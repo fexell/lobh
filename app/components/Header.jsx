@@ -1,17 +1,17 @@
 import {Suspense, useEffect, useId, useRef, useState} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router-dom';
-import {useAnalytics, useOptimisticCart, Image} from '@shopify/hydrogen';
+import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {Aside, useAside} from '~/components/Aside';
 import {SearchInput} from './SearchInput';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCartShopping, faBars, faMagnifyingGlass, faUser} from '@fortawesome/free-solid-svg-icons';
+import Logo from '../assets/Logo - Squares Only.svg';
 
 /**
  * @param {HeaderProps}
  */
 export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
   const {shop, menu} = header;
-  const logoImage = shop?.brand?.logo?.image;
   const {open} = useAside();
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -52,7 +52,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
         .lc-announcement a {
           color: #7AC9EF;
           text-decoration: none;
-          border-bottom: 1px solid rgba(201,184,122,0.4);
+          border-bottom: 1px solid rgba(122, 201, 239, 0.4);
           transition: border-color 0.2s;
         }
 
@@ -468,15 +468,13 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
 
             {/* Centered logo */}
             <div className="lc-logo-wrap">
-              <NavLink prefetch="intent" to="/" end>
-                {logoImage ? (
-                  <Image
+              <NavLink className="flex items-center justify-center" prefetch="intent" to="/" end>
+                {Logo ? (
+                  <img
+                    src={Logo}
                     alt={shop.name}
-                    data={logoImage}
-                    className="header-logo"
-                    width={logoImage.width}
-                    height={logoImage.height}
-                    sizes="200px"
+                    className="header-logo object-contain bg-center"
+                    style={{height: '40px', width: 'auto'}}
                   />
                 ) : (
                   <span className="lc-logo-text">{shop?.name}</span>
@@ -502,11 +500,6 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
               >
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
-
-              {/* Account icon */}
-              {/* <NavLink to="/account" className="lc-icon-btn" aria-label="Account">
-                <FontAwesomeIcon icon={faUser} />
-              </NavLink> */}
 
               {/* Cart icon */}
               <button

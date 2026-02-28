@@ -5,6 +5,8 @@ import FreeMapClientLoader from './FreeMapClientLoader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapPin, faMobile, faAt } from '@fortawesome/free-solid-svg-icons';
 
+import LogoWhite from '../assets/Logo - White.svg';
+
 /**
  * @param {FooterProps}
  */
@@ -84,7 +86,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
 
               .lc-footer-logo img {
                 filter: brightness(0) invert(1);
-                height: 48px !important;
+                height: 120px !important;
                 width: auto !important;
                 max-width: 180px;
                 object-fit: contain;
@@ -273,12 +275,8 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 {/* Brand / contact */}
                 <div className="lc-footer-brand">
                   <NavLink className="lc-footer-logo" prefetch="intent" to="/" end>
-                    {logoImage ? (
-                      <Image
-                        alt={shop.name}
-                        data={logoImage}
-                        sizes="180px"
-                      />
+                    {(LogoWhite && logoImage) ? (
+                      <img src={LogoWhite} alt={shop?.name} className="w-full h-42" />
                     ) : (
                       <span className="lc-footer-logo-text">{shop?.name}</span>
                     )}
