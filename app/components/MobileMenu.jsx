@@ -2,11 +2,13 @@ import {useState} from 'react';
 import {NavLink} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faChevronDown} from '@fortawesome/free-solid-svg-icons';
+import {useAside} from './Aside.jsx';
 
 export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
   const {menu, shop} = header;
   const logoImage = shop?.brand?.logo?.image;
   const [openItem, setOpenItem] = useState(null);
+  const {type: activeType, close} = useAside();
 
   const normalizeUrl = (url) => {
     if (!url) return '/';
@@ -221,6 +223,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
                         to={normalizeUrl(sub.url)}
                         className="mm-sub-link"
                         prefetch="intent"
+                        onClick={close}
                       >
                         {sub.title}
                       </NavLink>
@@ -237,6 +240,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
                   end
                   prefetch="intent"
                   to={url}
+                  onClick={close}
                 >
                   {item.title}
                 </NavLink>
