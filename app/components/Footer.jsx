@@ -2,6 +2,8 @@ import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router-dom';
 import {Image} from '@shopify/hydrogen';
 import FreeMapClientLoader from './FreeMapClientLoader';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapPin, faMobile, faAt } from '@fortawesome/free-solid-svg-icons';
 
 /**
  * @param {FooterProps}
@@ -285,21 +287,26 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                   </NavLink>
 
                   <div className="lc-footer-address">
-                    <div>Knut Peters väg 42</div>
+                    <div><FontAwesomeIcon icon={faMapPin} /> Knut Peters väg 42</div>
                     <div>302 41, Halmstad</div>
                     <br />
                     <div>
-                      Telefon:{' '}
+                      <FontAwesomeIcon icon={faMobile} /> Telefon:{' '}
                       <a href="tel:035191100">035 - 19 11 00</a>
                     </div>
                     <div>
-                      E-mail:{' '}
+                      <FontAwesomeIcon icon={faAt} /> E-mail:{' '}
                       <a href="mailto:info@yourstore.se">info@yourstore.se</a>
                     </div>
                   </div>
 
                   {/* Small map card */}
                   <div className="lc-footer-map">
+                    <a
+                    className="lc-footer-map-link absolute w-full h-full z-50"
+                    href="https://maps.app.goo.gl/QPGC2e9zLpWhWcHs5"
+                    target="_blank"
+                    rel="noopener noreferrer"></a>
                     <Suspense fallback={<div style={{height:'100%',background:'#1a1a1a',borderRadius:'6px'}} />}>
                       <FreeMapClientLoader />
                     </Suspense>
