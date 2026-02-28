@@ -1,12 +1,13 @@
 import {CartForm} from '@shopify/hydrogen';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import {faCartShopping} from '@fortawesome/free-solid-svg-icons';
 import {clsx} from 'clsx';
 
 /**
  * @param {{
  *   analytics?: unknown;
  *   children: React.ReactNode;
+ *   className?: string;
  *   disabled?: boolean;
  *   lines: Array<OptimisticCartLineInput>;
  *   onClick?: () => void;
@@ -15,35 +16,38 @@ import {clsx} from 'clsx';
 export function AddToCartButton({
   analytics,
   children,
+  className,
   disabled,
   lines,
   onClick,
 }) {
   return (
     <CartForm route="/cart" inputs={{lines}} action={CartForm.ACTIONS.LinesAdd}>
-      {(fetcher) => (
-        <>
-          <input
-            name="analytics"
-            type="hidden"
-            value={JSON.stringify(analytics)}
-          />
-          <button
-            className={clsx(
-              "p-4 rounded-xl bg-light-blue hover:bg-light-blue/80 hover:cursor-pointer",
-              {
-                'bg-gray-300! opacity-50 cursor-not-allowed!': disabled || fetcher.state !== 'idle',
-              }
-            )}
-            type="submit"
-            onClick={onClick}
-            disabled={disabled ?? fetcher.state !== 'idle'}
-          >
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            {children}
-          </button>
-        </>
-      )}
+      {(fetcher) => {
+        const isDisabled = disabled ?? fetcher.state !== 'idle';
+
+        return (
+          <>
+            <input
+              name="analytics"
+              type="hidden"
+              value={JSON.stringify(analytics)}
+            />
+            <button
+              type="submit"
+              className={className ?? clsx(
+                'pf-atc',
+                { 'pf-atc--disabled': isDisabled }
+              )}
+              onClick={onClick}
+              disabled={isDisabled}
+            >
+              <FontAwesomeIcon icon={faCartShopping} className="mr-2" />
+              {children}
+            </button>
+          </>
+        );
+      }}
     </CartForm>
   );
 }
