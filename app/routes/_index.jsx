@@ -631,7 +631,7 @@ export default function Homepage() {
               <Link to="/collections/all" className="hp-btn-primary">
                 Utforska sortimentet
               </Link>
-              <Link to="/pages/about" className="hp-btn-secondary">
+              <Link to="/pages/om-oss" className="hp-btn-secondary">
                 Om oss
               </Link>
             </div>
