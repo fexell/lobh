@@ -64,11 +64,11 @@ export default function Page() {
   const {page} = useLoaderData();
 
   return (
-    <div className="page">
+    <div className="page flex flex-col w-full justify-center items-center gap-8 py-12">
       <header>
         <h1>{page.title}</h1>
       </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+      <main className='w-full max-w-6xl px-4' dangerouslySetInnerHTML={{__html: page.body}} />
     </div>
   );
 }

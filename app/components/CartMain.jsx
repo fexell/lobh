@@ -47,7 +47,7 @@ export function CartMain({layout, cart: originalCart}) {
 function CartEmpty({hidden = false}) {
   const {close} = useAside();
   return (
-    <div hidden={hidden}>
+    <div hidden={hidden} className='cart-empty'>
       <br />
       <p>Ser ut som om du inte har lagt till något än, låt oss börja!</p>
       <br />

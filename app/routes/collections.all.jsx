@@ -59,7 +59,7 @@ export default function Collection() {
   const {products} = useLoaderData();
 
   return (
-    <div className="collection">
+    <div className="collection w-full max-w-6xl mx-auto py-12 px-4">
       <h1>Products</h1>
       <PaginatedResourceSection
         connection={products}

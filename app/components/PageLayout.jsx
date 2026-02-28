@@ -43,8 +43,8 @@ export function PageLayout({
           </Await>
         </Suspense>
       )}
-      <main className="flex flex-col items-center py-4">
-        <div className="lg:w-5xl">
+      <main className="flex flex-col items-center">
+        <div className="w-full">
           {children}
         </div>
       </main>

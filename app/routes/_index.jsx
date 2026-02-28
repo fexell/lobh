@@ -3,7 +3,7 @@ import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import { useVariantUrl } from '~/lib/variants';
-import Banner1 from '../assets/banner-1.jpg';
+import Banner1 from '../assets/banner-3.jpg';
 
 const BEST_SELLING_PRODUCT_QUERY = `#graphql
   fragment BestSellingProduct on Product {
@@ -35,6 +35,19 @@ const BEST_SELLING_PRODUCT_QUERY = `#graphql
   }
 `;
 
+const HOMEPAGE_QUERY = `#graphql
+  query HomePage($handle: String!, $country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    page(handle: $handle) {
+      id
+      title
+      body
+      bodySummary
+    }
+  }
+`;
+
+
 /**
  * @type {MetaFunction}
  */
@@ -61,14 +74,18 @@ export async function loader(args) {
  * @param {LoaderFunctionArgs}
  */
 async function loadCriticalData({ context }) {
-  const [{ collections }, { products }] = await Promise.all([
+  const [{ collections }, { products }, { page }] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
     context.storefront.query(BEST_SELLING_PRODUCT_QUERY),
+    context.storefront.query(HOMEPAGE_QUERY, {
+      variables: { handle: "Home" },
+    }),
   ]);
 
   return {
     featuredCollection: collections.nodes[0],
-    bestSellingProduct: products.nodes, // array with 1 item
+    bestSellingProduct: products.nodes,
+    homepage: page, // ← add this
   };
 }
 
@@ -94,27 +111,21 @@ function loadDeferredData({context}) {
 }
 
 export default function Homepage() {
-  /** @type {LoaderReturnData} */
   const data = useLoaderData();
-  const bestSellingProduct = data.bestSellingProduct || [];
-  const product = bestSellingProduct[0];
-
-  const variantUrl = bestSellingProduct[0]?.handle
-    ? useVariantUrl(bestSellingProduct[0].handle, [])
-    : '#';
-
+  const homepage = data.homepage;
 
   return (
     <div className="home">
+      <section className="homepage-banner relative w-full h-[calc(100vh-110px)]">
+        <div style={{ backgroundImage: `url(${Banner1})`, backgroundSize: "cover", backgroundRepeat: "no-repeat", backgroundPosition: "center" }} className="homepage-banner-image w-full h-full" />
+      </section>
+        <section className="homepage-content w-full max-w-6xl mx-auto py-12 px-4">
+          <div
+            dangerouslySetInnerHTML={{ __html: homepage.body }}
+          />
+        </section>
+
       {/* <FeaturedCollection collection={data.featuredCollection} /> */}
-      <div
-        className="relative flex flex-col h-96 justify-center items-end mb-8 rounded-xl before:absolute before:inset-0 before:bg-light-blue/80 before:rounded-xl"
-        style={{ backgroundImage: `url(${Banner1})`, backgroundSize: 'cover' }}>
-        <Link className="relative inline-block w-full max-w-48 h-full max-h-fit mr-8" to={variantUrl}>
-          <Image aspectRatio='1/1' className="rounded-full! object-contain" data={product.featuredImage} size="100%" sizes="(min-width: 45em) 50vw, 100vw" />
-        </Link>
-      </div>
-      <RecommendedProducts products={data.recommendedProducts} />
     </div>
   );
 }
