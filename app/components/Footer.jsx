@@ -2,10 +2,6 @@ import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router-dom';
 import {Image} from '@shopify/hydrogen';
 import FreeMapClientLoader from './FreeMapClientLoader';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapPin, faMobile, faAt } from '@fortawesome/free-solid-svg-icons';
-
-import LogoWhite from '../assets/Logo - White.svg';
 
 /**
  * @param {FooterProps}
@@ -20,6 +16,8 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
         {(footer) => (
           <>
             <style>{`
+              @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500;600&display=swap');
+
               .lc-footer {
                 font-family: 'Montserrat', sans-serif;
                 background: #111;
@@ -50,6 +48,15 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 background: rgba(10,10,10,0.2);
                 pointer-events: none;
                 border-radius: 6px;
+                transition: background 0.2s;
+              }
+
+              .lc-footer-map:hover::after {
+                background: rgba(10,10,10,0.05);
+              }
+
+              .lc-footer-map:hover {
+                border-color: rgba(122,201,239,0.3);
               }
 
               /* ── Main footer body ── */
@@ -86,7 +93,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
 
               .lc-footer-logo img {
                 filter: brightness(0) invert(1);
-                height: 120px !important;
+                height: 48px !important;
                 width: auto !important;
                 max-width: 180px;
                 object-fit: contain;
@@ -151,7 +158,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 left: 0;
                 width: 24px;
                 height: 1px;
-                background: #7AC9EF;
+                background: #c9b87a;
               }
 
               .lc-footer-col a {
@@ -263,7 +270,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
               }
 
               .lc-footer-gold {
-                color: #7AC9EF;
+                color: #c9b87a;
               }
             `}</style>
 
@@ -275,38 +282,44 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 {/* Brand / contact */}
                 <div className="lc-footer-brand">
                   <NavLink className="lc-footer-logo" prefetch="intent" to="/" end>
-                    {(LogoWhite && logoImage) ? (
-                      <img src={LogoWhite} alt={shop?.name} className="w-full h-42" />
+                    {logoImage ? (
+                      <Image
+                        alt={shop.name}
+                        data={logoImage}
+                        sizes="180px"
+                      />
                     ) : (
                       <span className="lc-footer-logo-text">{shop?.name}</span>
                     )}
                   </NavLink>
 
                   <div className="lc-footer-address">
-                    <div><FontAwesomeIcon icon={faMapPin} /> Knut Peters väg 42</div>
+                    <div>Knut Peters väg 42</div>
                     <div>302 41, Halmstad</div>
                     <br />
                     <div>
-                      <FontAwesomeIcon icon={faMobile} /> Telefon:{' '}
+                      Telefon:{' '}
                       <a href="tel:035191100">035 - 19 11 00</a>
                     </div>
                     <div>
-                      <FontAwesomeIcon icon={faAt} /> E-mail:{' '}
+                      E-mail:{' '}
                       <a href="mailto:info@yourstore.se">info@yourstore.se</a>
                     </div>
                   </div>
 
-                  {/* Small map card */}
-                  <div className="lc-footer-map">
-                    <a
-                    className="lc-footer-map-link absolute w-full h-full z-50"
-                    href="https://maps.app.goo.gl/QPGC2e9zLpWhWcHs5"
+                  {/* Small map card — links to Google Maps */}
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Knut+Peters+väg+42,+302+41+Halmstad"
                     target="_blank"
-                    rel="noopener noreferrer"></a>
+                    rel="noopener noreferrer"
+                    className="lc-footer-map"
+                    style={{display:'block', textDecoration:'none', cursor:'pointer'}}
+                    aria-label="Öppna i Google Maps"
+                  >
                     <Suspense fallback={<div style={{height:'100%',background:'#1a1a1a',borderRadius:'6px'}} />}>
                       <FreeMapClientLoader />
                     </Suspense>
-                  </div>
+                  </a>
                 </div>
 
                 {/* Opening hours */}
@@ -360,9 +373,14 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                   <div className="lc-footer-policy-links">
                     {footer?.menu &&
                       normalizeMenuItems(footer.menu, header.shop.primaryDomain.url, publicStoreDomain)
-                        .map((item) => (
-                          <a key={item.id} href={item.url}>{item.title}</a>
-                        ))
+                        .map((item) => {
+                          const isExternal = !item.url.startsWith('/');
+                          return isExternal ? (
+                            <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a>
+                          ) : (
+                            <NavLink key={item.id} prefetch="intent" to={item.url}>{item.title}</NavLink>
+                          );
+                        })
                     }
                   </div>
                 </div>
