@@ -3,6 +3,8 @@ import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router-dom';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 /**
  * A single line item in the cart. It displays the product image, title, price.
@@ -123,7 +125,7 @@ function CartLineRemoveButton({lineIds, disabled}) {
       inputs={{lineIds}}
     >
       <button className="text-red-600 cursor-pointer" disabled={disabled} type="submit">
-        Ta bort
+        <FontAwesomeIcon icon={faTrash} />
       </button>
     </CartForm>
   );

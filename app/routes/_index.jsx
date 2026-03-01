@@ -56,7 +56,7 @@ const HOMEPAGE_QUERY = `#graphql
 /* ─── Meta ──────────────────────────────────────────────────────────────── */
 
 /** @type {MetaFunction} */
-export const meta = () => [{title: 'Hydrogen | Home'}];
+export const meta = () => [{title: 'Ljud & Bild Hörnan | Home'}];
 
 /* ─── Loader ────────────────────────────────────────────────────────────── */
 
@@ -638,6 +638,16 @@ export default function Homepage() {
           </div>
         </section>
 
+        {/* ── CMS content from Shopify ── */}
+        {homepage?.body && (
+          <section className="hp-cms">
+            <div className="hp-cms-inner">
+              <div className="hp-section-label" style={{marginBottom: '32px'}}>Från redaktionen</div>
+              <div dangerouslySetInnerHTML={{__html: homepage.body}} />
+            </div>
+          </section>
+        )}
+
         {/* ── About / split ── */}
         <section className="hp-about">
           <div className="hp-about-inner">
@@ -742,16 +752,6 @@ export default function Homepage() {
             </div>
           </div>
         </section>
-
-        {/* ── CMS content from Shopify ── */}
-        {homepage?.body && (
-          <section className="hp-cms">
-            <div className="hp-cms-inner">
-              <div className="hp-section-label" style={{marginBottom: '32px'}}>Från redaktionen</div>
-              <div dangerouslySetInnerHTML={{__html: homepage.body}} />
-            </div>
-          </section>
-        )}
 
       </div>
     </>
