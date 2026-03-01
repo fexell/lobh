@@ -2,6 +2,7 @@ import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router-dom';
 import {Image} from '@shopify/hydrogen';
 import FreeMapClientLoader from './FreeMapClientLoader';
+import LogoWhite from '../assets/Logo - White.svg';
 
 /**
  * @param {FooterProps}
@@ -91,7 +92,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
 
               .lc-footer-logo img {
                 filter: brightness(0) invert(1);
-                height: 48px !important;
+                height: 108px !important;
                 width: auto !important;
                 max-width: 180px;
                 object-fit: contain;
@@ -281,11 +282,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 <div className="lc-footer-brand">
                   <NavLink className="lc-footer-logo" prefetch="intent" to="/" end>
                     {logoImage ? (
-                      <Image
-                        alt={shop.name}
-                        data={logoImage}
-                        sizes="180px"
-                      />
+                      <img src={LogoWhite} alt={shop?.name || 'Logo'} />
                     ) : (
                       <span className="lc-footer-logo-text">{shop?.name}</span>
                     )}
@@ -307,7 +304,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
 
                   {/* Small map card — links to Google Maps */}
                   <a
-                    href="https://www.google.com/maps/search/?api=1&query=Knut+Peters+väg+42,+302+41+Halmstad"
+                    href="https://www.google.com/maps/place/LJUD%26BILD-h%C3%B6rnan+(Katrineholms+Hemelektronik+AB)/@58.9943175,16.2040305,20.75z/data=!4m6!3m5!1s0x465eb79374d6daf5:0x52c3d9d250ad3550!8m2!3d58.9941049!4d16.2040504!16s%2Fg%2F12qgpb0f5?entry=ttu&g_ep=EgoyMDI2MDIyNS4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="lc-footer-map"
