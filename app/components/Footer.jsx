@@ -16,8 +16,6 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
         {(footer) => (
           <>
             <style>{`
-              @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500;600&display=swap');
-
               .lc-footer {
                 font-family: 'Montserrat', sans-serif;
                 background: #111;
@@ -129,7 +127,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
               }
 
               .lc-footer-address a:hover {
-                color: #c9b87a;
+                color: #7AC9EF;
               }
 
               /* ── Nav columns ── */
@@ -158,7 +156,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 left: 0;
                 width: 24px;
                 height: 1px;
-                background: #c9b87a;
+                background: #7AC9EF;
               }
 
               .lc-footer-col a {
@@ -270,7 +268,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
               }
 
               .lc-footer-gold {
-                color: #c9b87a;
+                color: #7AC9EF;
               }
             `}</style>
 
