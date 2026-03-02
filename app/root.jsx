@@ -9,6 +9,7 @@ import {
   useRouteLoaderData,
   ScrollRestoration,
   isRouteErrorResponse,
+  NavLink
 } from '@remix-run/react';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -425,12 +426,12 @@ export function ErrorBoundary() {
           )}
 
           <div className="err-actions">
-            <a href="/" className="err-btn-primary">
+            <NavLink to="/" className="err-btn-primary">
               Tillbaka till startsidan
-            </a>
-            <a href="/collections/all" className="err-btn-secondary">
+            </NavLink>
+            <NavLink to="/collections/all" className="err-btn-secondary">
               Se alla produkter
-            </a>
+            </NavLink>
           </div>
         </div>
 

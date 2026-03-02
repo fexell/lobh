@@ -3,6 +3,7 @@ import {Await, NavLink} from 'react-router-dom';
 import {Image} from '@shopify/hydrogen';
 import FreeMapClientLoader from './FreeMapClientLoader';
 import LogoWhite from '../assets/Logo - White.svg';
+import NewsletterForm from './Newsletter';
 
 /**
  * @param {FooterProps}
