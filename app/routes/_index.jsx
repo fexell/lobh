@@ -3,12 +3,29 @@ import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
+import { LogoMarquee } from '~/components/LogoMarquee';
 
 import Banner1 from '../assets/banner-4.jpg';
 import ContentImage1 from '../assets/banner-1.jpg';
 import CardImage1 from '../assets/card-image-1.jpg';
 import CardImage2 from '../assets/card-image-2.jpg';
 import CardImage3 from '../assets/card-image-3.jpg';
+
+import AppleLogo from '../assets/slide/apple_logo_white.png';
+import SamsungLogo from '../assets/slide/samsung-logo.avif';
+import LgLogo from '../assets/slide/lg-logo.avif';
+import ElectroluxLogo from '../assets/slide/electrolux_logo_white.png';
+import BoschLogo from '../assets/slide/bosch_symbol_logo_white.png';
+import MieleLogo from '../assets/slide/Miele-logo.png';
+
+const LOGOS = [
+  { src: AppleLogo, alt: 'Apple' },
+  { src: SamsungLogo, alt: 'Samsung' },
+  { src: LgLogo, alt: 'LG' },
+  { src: ElectroluxLogo, alt: 'Electrolux' },
+  { src: BoschLogo, alt: 'Bosch' },
+  { src: MieleLogo, alt: 'Miele' },
+]
 
 /* ─── GraphQL queries (unchanged) ──────────────────────────────────────── */
 
@@ -100,8 +117,6 @@ export default function Homepage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
-
         /* ── Globals for homepage ── */
         .hp {
           font-family: 'Montserrat', sans-serif;
@@ -752,6 +767,9 @@ export default function Homepage() {
             </div>
           </div>
         </section>
+
+        {/* ── Logo marquee ── */}
+        <LogoMarquee logos={LOGOS} />
 
       </div>
     </>
