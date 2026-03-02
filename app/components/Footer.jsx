@@ -177,6 +177,38 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 padding-left: 6px;
               }
 
+              /* ── Parent link with children ── */
+              .lc-footer-nav-group {
+                display: flex;
+                flex-direction: column;
+              }
+
+              .lc-footer-parent-link {
+                font-weight: 400 !important;
+                color: rgba(255,255,255,0.65) !important;
+                margin-top: 4px;
+              }
+
+              /* ── Child links ── */
+              .lc-footer-children {
+                display: flex;
+                flex-direction: column;
+                padding-left: 10px;
+                border-left: 1px solid rgba(255,255,255,0.08);
+                margin-bottom: 6px;
+              }
+
+              .lc-footer-child-link {
+                font-size: 11px !important;
+                color: rgba(255,255,255,0.35) !important;
+                padding: 3px 0 !important;
+              }
+
+              .lc-footer-child-link:hover {
+                color: rgba(255,255,255,0.75) !important;
+                padding-left: 6px !important;
+              }
+
               /* Opening hours block */
               .lc-footer-hours {
                 margin-bottom: 20px;
@@ -268,7 +300,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                 color: rgba(255,255,255,0.6);
               }
 
-              .lc-footer-gold {
+              .lc-footer-blue {
                 color: #7AC9EF;
               }
             `}</style>
@@ -336,7 +368,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                   </div>
                 </div>
 
-                {/* Header nav links (Lär känna oss style) */}
+                {/* Header nav links */}
                 <div className="lc-footer-col">
                   <div className="lc-footer-col-heading">Navigering</div>
                   <FooterNavLinks
@@ -363,7 +395,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
               <div className="lc-footer-bottom">
                 <div className="lc-footer-bottom-inner">
                   <div className="lc-footer-copy">
-                    © {new Date().getFullYear()} <span className="lc-footer-gold">{shop?.name}</span>. Alla rättigheter förbehållna.
+                    © {new Date().getFullYear()} <span className="lc-footer-blue">{shop?.name}</span>. Alla rättigheter förbehållna.
                   </div>
                   <div className="lc-footer-policy-links">
                     {footer?.menu &&
@@ -404,6 +436,15 @@ function normalizeMenuItems(menu, primaryDomainUrl, publicStoreDomain) {
   });
 }
 
+function normalizeUrl(url, primaryDomainUrl, publicStoreDomain) {
+  if (!url) return url;
+  return url.includes('myshopify.com') ||
+    url.includes(publicStoreDomain) ||
+    url.includes(primaryDomainUrl)
+    ? new URL(url).pathname
+    : url;
+}
+
 function FooterNavLinks({menu, primaryDomainUrl, publicStoreDomain}) {
   const items = normalizeMenuItems(menu, primaryDomainUrl, publicStoreDomain);
 
@@ -412,14 +453,68 @@ function FooterNavLinks({menu, primaryDomainUrl, publicStoreDomain}) {
       {items.map((item) => {
         if (!item.url) return null;
         const isExternal = !item.url.startsWith('/');
-        return isExternal ? (
-          <a key={item.id} href={item.url} rel="noopener noreferrer" target="_blank">
+        const hasChildren = item.items && item.items.length > 0;
+
+        const parentLink = isExternal ? (
+          <a
+            key={item.id}
+            href={item.url}
+            rel="noopener noreferrer"
+            target="_blank"
+            className={hasChildren ? 'lc-footer-parent-link' : undefined}
+          >
             {item.title}
           </a>
         ) : (
-          <NavLink key={item.id} end prefetch="intent" to={item.url}>
+          <NavLink
+            key={item.id}
+            end
+            prefetch="intent"
+            to={item.url}
+            className={hasChildren ? 'lc-footer-parent-link' : undefined}
+          >
             {item.title}
           </NavLink>
+        );
+
+        if (!hasChildren) return parentLink;
+
+        const normalizedChildren = item.items.map((child) => ({
+          ...child,
+          url: normalizeUrl(child.url, primaryDomainUrl, publicStoreDomain),
+        }));
+
+        return (
+          <div key={item.id} className="lc-footer-nav-group">
+            {parentLink}
+            <div className="lc-footer-children">
+              {normalizedChildren.map((child) => {
+                if (!child.url) return null;
+                const childIsExternal = !child.url.startsWith('/');
+                return childIsExternal ? (
+                  <a
+                    key={child.id}
+                    href={child.url}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    className="lc-footer-child-link"
+                  >
+                    {child.title}
+                  </a>
+                ) : (
+                  <NavLink
+                    key={child.id}
+                    end
+                    prefetch="intent"
+                    to={child.url}
+                    className="lc-footer-child-link"
+                  >
+                    {child.title}
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
         );
       })}
     </>
