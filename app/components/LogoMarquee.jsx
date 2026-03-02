@@ -26,9 +26,9 @@
  *   label?: string;   // optional label above the strip
  * }}
  */
-export function LogoMarquee({logos, speed = 120, label = 'Företag som litar på oss'}) {
+export function LogoMarquee({logos, speed = 240, label = 'Företag som litar på oss'}) {
   // Duplicate logos so the seam is invisible
-  const doubled = [...logos, ...logos, ...logos];
+  const doubled = [...logos, ...logos, ...logos, ...logos, ...logos, ...logos];
 
   return (
     <>
