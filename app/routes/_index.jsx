@@ -7,9 +7,9 @@ import { LogoMarquee } from '~/components/LogoMarquee';
 
 import Banner1 from '../assets/banner-4.jpg';
 import ContentImage1 from '../assets/banner-1.jpg';
-import CardImage1 from '../assets/card-image-1.jpg';
-import CardImage2 from '../assets/card-image-2.jpg';
-import CardImage3 from '../assets/card-image-3.jpg';
+import CardImage1 from '../assets/cards/card-image-1_small.jpg';
+import CardImage2 from '../assets/cards/card-image-2_small.jpg';
+import CardImage3 from '../assets/cards/card-image-3_small.jpg';
 
 import AppleLogo from '../assets/slide/apple_logo_white.png';
 import SamsungLogo from '../assets/slide/samsung-logo.avif';
