@@ -80,6 +80,12 @@ export default function Collection() {
           font-family: 'Montserrat', sans-serif;
         }
 
+        .col-hero-img,
+        .col-hero-overlay {
+          overflow: hidden;
+          border-radius: inherit;
+        }
+
         /* ── Hero banner ── */
         .col-hero {
           position: relative;
