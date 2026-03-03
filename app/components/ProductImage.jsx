@@ -17,6 +17,12 @@ export function ProductImage({image}) {
         data={image}
         key={image.id}
         sizes="(min-width: 45em) 50vw, 100vw"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          display: 'block',
+        }}
       />
     </div>
   );

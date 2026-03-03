@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import {Suspense, useState} from 'react';
 import {defer, redirect} from '@netlify/remix-runtime';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {
@@ -83,12 +83,17 @@ export default function Product() {
   const {product, variants} = useLoaderData();
   const selectedVariant = useOptimisticVariant(product.selectedVariant, variants);
   const {title, descriptionHtml, vendor} = product;
+  const [zoom, setZoom] = useState({
+    active: false,
+    x: 0,
+    y: 0,
+    imgWidth: 0,
+    imgHeight: 0,
+  });
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Montserrat:wght@300;400;500;600&display=swap');
-
         :root {
           --accent: #7AC9EF;
           --accent-dim: rgba(122, 201, 239, 0.1);
@@ -171,7 +176,7 @@ export default function Product() {
         }
 
         .pp-img-main {
-          position: relative;
+          /* position: relative; */
           overflow: hidden;
           border-radius: 4px;
           background: #1a1a1a;
@@ -206,6 +211,27 @@ export default function Product() {
           height: 100% !important;
           object-fit: contain !important;
           display: block;
+        }
+
+        .pp-zoom-window {
+          position: absolute;
+          top: 0;
+          right: -590px; /* flytta zoom-rutan till höger om bilden */
+          width: 400px;
+          height: 400px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background-repeat: no-repeat;
+          background-size: 200%; /* zoom-nivå */
+          pointer-events: none;
+          z-index: 10;
+          border-radius: 4px;
+          background-color: #000;
+        }
+
+        @media (max-width: 1024px) {
+          .pp-zoom-window {
+            display: none; /* stäng av zoom på mobil */
+          }
         }
 
         /* ── Info column ── */
@@ -526,8 +552,42 @@ export default function Product() {
 
           {/* Left: image */}
           <div className="pp-images">
-            <div className="pp-img-main">
+            <div
+              className="pp-img-main"
+              onMouseEnter={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setZoom((z) => ({
+                  ...z,
+                  active: true,
+                  imgWidth: rect.width,
+                  imgHeight: rect.height,
+                }));
+              }}
+              onMouseLeave={() => setZoom((z) => ({...z, active: false}))}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                setZoom((z) => ({
+                  ...z,
+                  x: x / rect.width,
+                  y: y / rect.height,
+                }));
+              }}
+            >
               <ProductImage image={selectedVariant?.image} />
+
+              {/* Zoomed image */}
+              {zoom.active && (
+                <div
+                  className="pp-zoom-window"
+                  style={{
+                    backgroundImage: `url(${selectedVariant?.image?.url})`,
+                    backgroundPosition: `${zoom.x * 100}% ${zoom.y * 100}%`,
+                  }}
+                />
+              )}
             </div>
           </div>
 
