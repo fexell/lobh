@@ -1,4 +1,4 @@
-import {Suspense, useState} from 'react';
+import {Suspense, useState, useRef, useEffect} from 'react';
 import {defer, redirect} from '@netlify/remix-runtime';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {
@@ -87,9 +87,31 @@ export default function Product() {
     active: false,
     x: 0,
     y: 0,
-    imgWidth: 0,
-    imgHeight: 0,
+    scale: 2.5,
   });
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    function checkMouse(e) {
+      if(!imgRef.current) return;
+      
+      const rect = imgRef.current.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if(inside) {
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        setZoom((z) => ({...z, active: true, x, y}));
+      }
+    }
+
+    window.addEventListener('mousemove', checkMouse);
+    return () => window.removeEventListener('mousemove', checkMouse);
+  }, [])
 
   return (
     <>
@@ -175,14 +197,14 @@ export default function Product() {
           top: 96px;
         }
 
-        .pp-img-main {
+        /* .pp-img-main {
           /* position: relative; */
           overflow: hidden;
           border-radius: 4px;
           background: #1a1a1a;
           border: 1px solid rgba(255,255,255,0.06);
           aspect-ratio: 1 / 1;
-        }
+        } */
 
         /* Blue corner accent */
         .pp-img-main::before {
@@ -213,25 +235,23 @@ export default function Product() {
           display: block;
         }
 
-        .pp-zoom-window {
-          position: absolute;
-          top: 0;
-          right: -590px; /* flytta zoom-rutan till höger om bilden */
-          width: 400px;
-          height: 400px;
-          border: 1px solid rgba(255,255,255,0.1);
-          background-repeat: no-repeat;
-          background-size: 200%; /* zoom-nivå */
-          pointer-events: none;
-          z-index: 10;
-          border-radius: 4px;
-          background-color: #000;
+        .pp-img-main {
+          position: relative;
+          overflow: hidden; /* viktigt! */
         }
 
-        @media (max-width: 1024px) {
-          .pp-zoom-window {
-            display: none; /* stäng av zoom på mobil */
-          }
+        .pp-img-zoom-inner {
+          width: 100%;
+          height: 100%;
+          transform-origin: top left;
+          transition: transform 0.1s ease-out;
+        }
+
+        .pp-img-zoom-inner img {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: contain !important;
+          pointer-events: none;
         }
 
         /* ── Info column ── */
@@ -553,41 +573,28 @@ export default function Product() {
           {/* Left: image */}
           <div className="pp-images">
             <div
-              className="pp-img-main"
-              onMouseEnter={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                setZoom((z) => ({
-                  ...z,
-                  active: true,
-                  imgWidth: rect.width,
-                  imgHeight: rect.height,
-                }));
-              }}
+              ref={imgRef}
+              className="pp-img-main cursor-zoom-in"
+              onMouseEnter={() => setZoom((z) => ({...z, active: true}))}
               onMouseLeave={() => setZoom((z) => ({...z, active: false}))}
               onMouseMove={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
 
-                setZoom((z) => ({
-                  ...z,
-                  x: x / rect.width,
-                  y: y / rect.height,
-                }));
+                setZoom((z) => ({...z, x, y}));
               }}
             >
-              <ProductImage image={selectedVariant?.image} />
-
-              {/* Zoomed image */}
-              {zoom.active && (
-                <div
-                  className="pp-zoom-window"
-                  style={{
-                    backgroundImage: `url(${selectedVariant?.image?.url})`,
-                    backgroundPosition: `${zoom.x * 100}% ${zoom.y * 100}%`,
-                  }}
-                />
-              )}
+              <div
+                className="pp-img-zoom-inner"
+                style={{
+                  transform: zoom.active
+                    ? `scale(${zoom.scale}) translate(${-zoom.x * 100 / zoom.scale}%, ${-zoom.y * 100 / zoom.scale}%)`
+                    : "scale(1) translate(0,0)",
+                }}
+              >
+                <ProductImage image={selectedVariant?.image} />
+              </div>
             </div>
           </div>
 
