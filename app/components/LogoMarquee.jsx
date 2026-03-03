@@ -26,7 +26,7 @@
  *   label?: string;   // optional label above the strip
  * }}
  */
-export function LogoMarquee({logos, speed = 240, label = 'Företag som litar på oss'}) {
+export function LogoMarquee({logos, speed = 120, label = 'Företag som litar på oss'}) {
   // Duplicate logos so the seam is invisible
   const doubled = [...logos, ...logos, ...logos, ...logos, ...logos, ...logos];
 
@@ -88,7 +88,7 @@ export function LogoMarquee({logos, speed = 240, label = 'Företag som litar på
 
         @keyframes marqueeScroll {
           from { transform: translateX(0); }
-          to   { transform: translateX(-100%); }
+          to   { transform: translateX(-50%); }
         }
 
         .lm-logo {

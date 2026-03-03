@@ -66,8 +66,6 @@ export default function Collection() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@300;400;500;600&display=swap');
-
         :root {
           --accent: #7AC9EF;
           --accent-dim: rgba(122, 201, 239, 0.15);
