@@ -1,7 +1,8 @@
 import {useState, useRef, useEffect} from 'react';
-import {useFetcher} from 'react-router-dom';
+import {useFetcher, useNavigation, useLocation} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
+import { NavLink } from '@remix-run/react';
 
 export function SearchInput({classNames}) {
   const fetcher = useFetcher({key: 'search'});
@@ -10,6 +11,8 @@ export function SearchInput({classNames}) {
   const inputRef = useRef(null);
   const popupRef = useRef(null);
   const wrapRef = useRef(null);
+  const location = useLocation();
+  const navigation = useNavigation();
 
   const results = fetcher.data?.result?.items?.products || [];
 
@@ -34,6 +37,15 @@ export function SearchInput({classNames}) {
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
   }, []);
+
+  useEffect(() => {
+    if(navigation.state === 'loading') {
+      setOpen(false);
+      setFocused(false);
+
+      if(inputRef.current) inputRef.current.value = '';
+    }
+  }, [navigation.state]);
 
   function handleChange(e) {
     const term = e.target.value;

@@ -1,11 +1,22 @@
 import {defer} from '@netlify/remix-runtime';
-import {useLoaderData, Link} from '@remix-run/react';
+import {useLoaderData, Link, useNavigate, useLocation} from '@remix-run/react';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {useState, useRef, useEffect} from 'react';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = () => [{title: 'Katalog | Alla produkter'}];
+
+const SORT_OPTIONS = [
+  {label: 'Rekommenderat',  key: 'RELEVANCE',    reverse: false},
+  {label: 'Nyast först',    key: 'CREATED_AT',   reverse: true},
+  {label: 'Lägst pris',     key: 'PRICE',        reverse: false},
+  {label: 'Högst pris',     key: 'PRICE',        reverse: true},
+  {label: 'Namn A–Ö',       key: 'TITLE',        reverse: false},
+  {label: 'Namn Ö–A',       key: 'TITLE',        reverse: true},
+  {label: 'Bästsäljare',    key: 'BEST_SELLING', reverse: false},
+];
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
@@ -16,11 +27,17 @@ export async function loader(args) {
 
 async function loadCriticalData({context, request}) {
   const {storefront} = context;
+  const url = new URL(request.url);
+  const sortKey = url.searchParams.get('sort') || 'RELEVANCE';
+  const reverse = url.searchParams.get('reverse') === 'true';
   const paginationVariables = getPaginationVariables(request, {pageBy: 12});
+
   const [{products}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {variables: {...paginationVariables}}),
+    storefront.query(CATALOG_QUERY, {
+      variables: {...paginationVariables, sortKey, reverse},
+    }),
   ]);
-  return {products};
+  return {products, sortKey, reverse};
 }
 
 function loadDeferredData() {
@@ -28,13 +45,11 @@ function loadDeferredData() {
 }
 
 export default function Collection() {
-  const {products} = useLoaderData();
+  const {products, sortKey, reverse} = useLoaderData();
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@300;400;500;600&display=swap');
-
         .cat-page {
           background: #111;
           min-height: 100vh;
@@ -55,7 +70,14 @@ export default function Collection() {
         .cat-header-inner {
           max-width: 1280px;
           margin: 0 auto;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
         }
+
+        .cat-header-text {}
 
         .cat-label {
           font-size: 9px;
@@ -92,6 +114,135 @@ export default function Collection() {
           font-weight: 300;
           color: rgba(255,255,255,0.25);
           letter-spacing: 0.08em;
+        }
+
+        /* ── Sort dropdown ── */
+        .sort-wrapper {
+          position: relative;
+          flex-shrink: 0;
+        }
+
+        .sort-trigger {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 11px 20px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.55);
+          border: 1px solid rgba(255,255,255,0.10);
+          border-radius: 3px;
+          background: rgba(255,255,255,0.03);
+          cursor: pointer;
+          transition: color 0.2s, border-color 0.2s, background 0.2s;
+          white-space: nowrap;
+          user-select: none;
+        }
+
+        .sort-trigger:hover {
+          color: rgba(255,255,255,0.85);
+          border-color: rgba(122,201,239,0.35);
+          background: rgba(122,201,239,0.04);
+        }
+
+        .sort-trigger.open {
+          color: #7AC9EF;
+          border-color: rgba(122,201,239,0.5);
+          background: rgba(122,201,239,0.05);
+        }
+
+        .sort-trigger-label {
+          color: rgba(255,255,255,0.25);
+          margin-right: 2px;
+        }
+
+        .sort-trigger-value {
+          color: inherit;
+        }
+
+        .sort-chevron {
+          width: 10px;
+          height: 10px;
+          opacity: 0.5;
+          transition: transform 0.2s, opacity 0.2s;
+          flex-shrink: 0;
+        }
+
+        .sort-trigger.open .sort-chevron {
+          transform: rotate(180deg);
+          opacity: 1;
+        }
+
+        .sort-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          min-width: 200px;
+          background: #1a1a1a;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 4px;
+          overflow: hidden;
+          z-index: 100;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+          opacity: 0;
+          transform: translateY(-6px);
+          pointer-events: none;
+          transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .sort-menu.open {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
+        }
+
+        .sort-option {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 18px;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.45);
+          cursor: pointer;
+          transition: background 0.15s, color 0.15s;
+          border: none;
+          background: none;
+          width: 100%;
+          text-align: left;
+          font-family: 'Montserrat', sans-serif;
+        }
+
+        .sort-option:hover {
+          background: rgba(255,255,255,0.04);
+          color: rgba(255,255,255,0.8);
+        }
+
+        .sort-option.active {
+          color: #7AC9EF;
+          background: rgba(122,201,239,0.06);
+        }
+
+        .sort-option-check {
+          width: 14px;
+          height: 14px;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+
+        .sort-option.active .sort-option-check {
+          opacity: 1;
+        }
+
+        .sort-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.05);
+          margin: 4px 0;
         }
 
         /* ── Grid wrapper ── */
@@ -132,14 +283,12 @@ export default function Collection() {
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
-          group: true;
         }
 
         .pcard:hover {
           background: #1e1e1e;
         }
 
-        /* Gold top line on hover */
         .pcard::before {
           content: '';
           position: absolute;
@@ -156,7 +305,6 @@ export default function Collection() {
           transform: scaleX(1);
         }
 
-        /* Image area */
         .pcard-img-wrap {
           position: relative;
           overflow: hidden;
@@ -176,7 +324,6 @@ export default function Collection() {
           transform: scale(1.05);
         }
 
-        /* No-image placeholder */
         .pcard-no-img {
           width: 100%;
           aspect-ratio: 1 / 1;
@@ -193,7 +340,6 @@ export default function Collection() {
           font-weight: 300;
         }
 
-        /* Card body */
         .pcard-body {
           padding: 20px 22px 24px;
         }
@@ -288,13 +434,15 @@ export default function Collection() {
       `}</style>
 
       <div className="cat-page">
-
         {/* Page header */}
         <div className="cat-header">
           <div className="cat-header-inner">
-            <div className="cat-label">Sortiment</div>
-            <h1 className="cat-title">Alla produkter</h1>
-            <p className="cat-count">Bläddra i hela vårt utbud</p>
+            <div className="cat-header-text">
+              <div className="cat-label">Sortiment</div>
+              <h1 className="cat-title">Alla produkter</h1>
+              <p className="cat-count">Bläddra i hela vårt utbud</p>
+            </div>
+            <SortDropdown currentSortKey={sortKey} currentReverse={reverse} />
           </div>
         </div>
 
@@ -313,9 +461,79 @@ export default function Collection() {
             )}
           </PaginatedResourceSection>
         </div>
-
       </div>
     </>
+  );
+}
+
+/** Sort dropdown component */
+function SortDropdown({currentSortKey, currentReverse}) {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const ref = useRef(null);
+
+  const activeOption =
+    SORT_OPTIONS.find(
+      (o) => o.key === currentSortKey && o.reverse === currentReverse,
+    ) || SORT_OPTIONS[0];
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  function selectOption(option) {
+    const params = new URLSearchParams(location.search);
+    params.set('sort', option.key);
+    params.set('reverse', String(option.reverse));
+    // Reset pagination when sorting changes
+    params.delete('cursor');
+    params.delete('direction');
+    navigate(`${location.pathname}?${params.toString()}`, {replace: true});
+    setOpen(false);
+  }
+
+  return (
+    <div className="sort-wrapper" ref={ref}>
+      <button
+        className={`sort-trigger${open ? ' open' : ''}`}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="sort-trigger-label">Sortera&nbsp;</span>
+        <span className="sort-trigger-value">{activeOption.label}</span>
+        <svg className="sort-chevron" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      <div className={`sort-menu${open ? ' open' : ''}`} role="listbox">
+        {SORT_OPTIONS.map((option, i) => {
+          const isActive =
+            option.key === currentSortKey && option.reverse === currentReverse;
+          return (
+            <button
+              key={`${option.key}-${option.reverse}`}
+              className={`sort-option${isActive ? ' active' : ''}`}
+              role="option"
+              aria-selected={isActive}
+              onClick={() => selectOption(option)}
+            >
+              {option.label}
+              <svg className="sort-option-check" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.5 7L5.5 10L11.5 4" stroke="#7AC9EF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -356,7 +574,7 @@ function ProductItem({product, loading}) {
   );
 }
 
-/* ─── GraphQL (unchanged) ─────────────────────────────────────────────── */
+/* ─── GraphQL ─────────────────────────────────────────────────────────── */
 
 const PRODUCT_ITEM_FRAGMENT = `#graphql
   fragment MoneyProductItem on MoneyV2 {
@@ -401,8 +619,17 @@ const CATALOG_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    products(
+      first: $first
+      last: $last
+      before: $startCursor
+      after: $endCursor
+      sortKey: $sortKey
+      reverse: $reverse
+    ) {
       nodes {
         ...ProductItem
       }

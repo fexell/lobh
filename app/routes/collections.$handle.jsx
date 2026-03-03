@@ -1,5 +1,5 @@
 import {defer, redirect} from '@netlify/remix-runtime';
-import {useLoaderData, Link} from '@remix-run/react';
+import {useLoaderData, Link, useNavigate, useLocation} from '@remix-run/react';
 import {
   getPaginationVariables,
   Image,
@@ -8,10 +8,21 @@ import {
 } from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {useState, useRef, useEffect} from 'react';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = ({data}) => [
   {title: `${data?.collection.title ?? 'Kollektion'} | Katalog`},
+];
+
+const SORT_OPTIONS = [
+  {label: 'Rekommenderat',  key: 'RELEVANCE',    reverse: false},
+  {label: 'Nyast först',    key: 'CREATED_AT',   reverse: true},
+  {label: 'Lägst pris',     key: 'PRICE',        reverse: false},
+  {label: 'Högst pris',     key: 'PRICE',        reverse: true},
+  {label: 'Namn A–Ö',       key: 'TITLE',        reverse: false},
+  {label: 'Namn Ö–A',       key: 'TITLE',        reverse: true},
+  {label: 'Bästsäljare',    key: 'BEST_SELLING', reverse: false},
 ];
 
 /** @param {LoaderFunctionArgs} args */
@@ -24,13 +35,16 @@ export async function loader(args) {
 async function loadCriticalData({context, params, request}) {
   const {handle} = params;
   const {storefront} = context;
+  const url = new URL(request.url);
+  const sortKey = url.searchParams.get('sort') || 'RELEVANCE';
+  const reverse = url.searchParams.get('reverse') === 'true';
   const paginationVariables = getPaginationVariables(request, {pageBy: 12});
 
   if (!handle) throw redirect('/collections');
 
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables},
+      variables: {handle, ...paginationVariables, sortKey, reverse},
     }),
   ]);
 
@@ -38,7 +52,7 @@ async function loadCriticalData({context, params, request}) {
     throw new Response(`Collection ${handle} not found`, {status: 404});
   }
 
-  return {collection};
+  return {collection, sortKey, reverse};
 }
 
 function loadDeferredData() {
@@ -46,7 +60,7 @@ function loadDeferredData() {
 }
 
 export default function Collection() {
-  const {collection} = useLoaderData();
+  const {collection, sortKey, reverse} = useLoaderData();
   const hasImage = !!collection.image;
 
   return (
@@ -54,7 +68,6 @@ export default function Collection() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@300;400;500;600&display=swap');
 
-        /* ── Accent colour ── */
         :root {
           --accent: #7AC9EF;
           --accent-dim: rgba(122, 201, 239, 0.15);
@@ -67,12 +80,11 @@ export default function Collection() {
           font-family: 'Montserrat', sans-serif;
         }
 
-        /* ── Hero banner (shown when collection has an image) ── */
+        /* ── Hero banner ── */
         .col-hero {
           position: relative;
           width: 100%;
           height: 340px;
-          overflow: hidden;
         }
 
         .col-hero-img {
@@ -122,7 +134,14 @@ export default function Collection() {
         .col-header-inner {
           max-width: 1280px;
           margin: 0 auto;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
         }
+
+        .col-header-text {}
 
         /* ── Shared header elements ── */
         .col-label {
@@ -196,6 +215,17 @@ export default function Collection() {
           text-transform: uppercase;
           color: rgba(255,255,255,0.55);
         }
+
+        /* Hero sort — floated to bottom-right */
+        .col-hero-footer {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+
+        .col-hero-text {}
 
         /* ── Grid body ── */
         .col-body {
@@ -317,6 +347,142 @@ export default function Collection() {
           letter-spacing: 0.02em;
         }
 
+        /* ── Sort dropdown ── */
+        .sort-wrapper {
+          position: relative;
+          flex-shrink: 0;
+        }
+
+        .sort-trigger {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 11px 20px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.55);
+          border: 1px solid rgba(255,255,255,0.10);
+          border-radius: 3px;
+          background: rgba(255,255,255,0.03);
+          cursor: pointer;
+          transition: color 0.2s, border-color 0.2s, background 0.2s;
+          white-space: nowrap;
+          user-select: none;
+        }
+
+        .sort-trigger:hover {
+          color: rgba(255,255,255,0.85);
+          border-color: var(--accent-border);
+          background: var(--accent-dim);
+        }
+
+        .sort-trigger.open {
+          color: var(--accent);
+          border-color: var(--accent-border);
+          background: rgba(122,201,239,0.05);
+        }
+
+        /* On hero, slightly more opaque backdrop so it reads over the image */
+        .sort-trigger--hero {
+          background: rgba(0,0,0,0.35);
+          border-color: rgba(255,255,255,0.15);
+          backdrop-filter: blur(6px);
+        }
+
+        .sort-trigger--hero:hover,
+        .sort-trigger--hero.open {
+          background: rgba(122,201,239,0.12);
+          border-color: var(--accent-border);
+        }
+
+        .sort-trigger-label {
+          color: rgba(255,255,255,0.25);
+          margin-right: 2px;
+        }
+
+        .sort-trigger-value {
+          color: inherit;
+        }
+
+        .sort-chevron {
+          width: 10px;
+          height: 10px;
+          opacity: 0.5;
+          transition: transform 0.2s, opacity 0.2s;
+          flex-shrink: 0;
+        }
+
+        .sort-trigger.open .sort-chevron {
+          transform: rotate(180deg);
+          opacity: 1;
+        }
+
+        .sort-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          min-width: 200px;
+          background: #1a1a1a;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 4px;
+          overflow: hidden;
+          z-index: 100;
+          box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+          opacity: 0;
+          transform: translateY(-6px);
+          pointer-events: none;
+          transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .sort-menu.open {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
+        }
+
+        .sort-option {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 18px;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.45);
+          cursor: pointer;
+          transition: background 0.15s, color 0.15s;
+          border: none;
+          background: none;
+          width: 100%;
+          text-align: left;
+          font-family: 'Montserrat', sans-serif;
+        }
+
+        .sort-option:hover {
+          background: rgba(255,255,255,0.04);
+          color: rgba(255,255,255,0.8);
+        }
+
+        .sort-option.active {
+          color: var(--accent);
+          background: rgba(122,201,239,0.06);
+        }
+
+        .sort-option-check {
+          width: 14px;
+          height: 14px;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+
+        .sort-option.active .sort-option-check {
+          opacity: 1;
+        }
+
         /* ── Empty state ── */
         .col-empty {
           text-align: center;
@@ -398,26 +564,38 @@ export default function Collection() {
                 <span className="col-breadcrumb-sep">›</span>
                 <span className="col-breadcrumb-current">{collection.title}</span>
               </div>
-              <div className="col-label">Kollektion</div>
-              <h1 className="col-title">{collection.title}</h1>
-              {collection.description && (
-                <p className="col-description">{collection.description}</p>
-              )}
+              <div className="col-hero-footer">
+                <div className="col-hero-text">
+                  <div className="col-label">Kollektion</div>
+                  <h1 className="col-title">{collection.title}</h1>
+                  {collection.description && (
+                    <p className="col-description">{collection.description}</p>
+                  )}
+                </div>
+                <SortDropdown
+                  currentSortKey={sortKey}
+                  currentReverse={reverse}
+                  heroVariant
+                />
+              </div>
             </div>
           </div>
         ) : (
           <div className="col-header">
             <div className="col-header-inner">
-              <div className="col-breadcrumb">
-                <Link to="/collections/all">Katalog</Link>
-                <span className="col-breadcrumb-sep">›</span>
-                <span className="col-breadcrumb-current">{collection.title}</span>
+              <div className="col-header-text">
+                <div className="col-breadcrumb">
+                  <Link to="/collections/all">Katalog</Link>
+                  <span className="col-breadcrumb-sep">›</span>
+                  <span className="col-breadcrumb-current">{collection.title}</span>
+                </div>
+                <div className="col-label">Kollektion</div>
+                <h1 className="col-title">{collection.title}</h1>
+                {collection.description && (
+                  <p className="col-description">{collection.description}</p>
+                )}
               </div>
-              <div className="col-label">Kollektion</div>
-              <h1 className="col-title">{collection.title}</h1>
-              {collection.description && (
-                <p className="col-description">{collection.description}</p>
-              )}
+              <SortDropdown currentSortKey={sortKey} currentReverse={reverse} />
             </div>
           </div>
         )}
@@ -448,6 +626,83 @@ export default function Collection() {
         />
       </div>
     </>
+  );
+}
+
+/** Sort dropdown — works for both hero and plain-header variants */
+function SortDropdown({currentSortKey, currentReverse, heroVariant = false}) {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const ref = useRef(null);
+
+  const activeOption =
+    SORT_OPTIONS.find(
+      (o) => o.key === currentSortKey && o.reverse === currentReverse,
+    ) || SORT_OPTIONS[0];
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  function selectOption(option) {
+    const params = new URLSearchParams(location.search);
+    params.set('sort', option.key);
+    params.set('reverse', String(option.reverse));
+    params.delete('cursor');
+    params.delete('direction');
+    navigate(`${location.pathname}?${params.toString()}`, {replace: true});
+    setOpen(false);
+  }
+
+  const triggerClass = [
+    'sort-trigger',
+    open ? 'open' : '',
+    heroVariant ? 'sort-trigger--hero' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <div className="sort-wrapper" ref={ref}>
+      <button
+        className={triggerClass}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="sort-trigger-label">Sortera&nbsp;</span>
+        <span className="sort-trigger-value">{activeOption.label}</span>
+        <svg className="sort-chevron" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      <div className={`sort-menu${open ? ' open' : ''}`} role="listbox">
+        {SORT_OPTIONS.map((option) => {
+          const isActive =
+            option.key === currentSortKey && option.reverse === currentReverse;
+          return (
+            <button
+              key={`${option.key}-${option.reverse}`}
+              className={`sort-option${isActive ? ' active' : ''}`}
+              role="option"
+              aria-selected={isActive}
+              onClick={() => selectOption(option)}
+            >
+              {option.label}
+              <svg className="sort-option-check" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.5 7L5.5 10L11.5 4" stroke="#7AC9EF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -483,7 +738,7 @@ function ProductItem({product, loading}) {
   );
 }
 
-/* ─── GraphQL (unchanged) ─────────────────────────────────────────────── */
+/* ─── GraphQL ─────────────────────────────────────────────────────────── */
 
 const PRODUCT_ITEM_FRAGMENT = `#graphql
   fragment MoneyProductItem on MoneyV2 {
@@ -530,6 +785,8 @@ const COLLECTION_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductCollectionSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -543,10 +800,12 @@ const COLLECTION_QUERY = `#graphql
         height
       }
       products(
-        first: $first,
-        last: $last,
-        before: $startCursor,
+        first: $first
+        last: $last
+        before: $startCursor
         after: $endCursor
+        sortKey: $sortKey
+        reverse: $reverse
       ) {
         nodes {
           ...ProductItem
