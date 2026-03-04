@@ -247,7 +247,6 @@ export default function ContactPage() {
           display: flex;
           flex-direction: column;
           gap: 40px;
-          position: sticky;
           top: 32px;
         }
 
