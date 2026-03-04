@@ -23,6 +23,7 @@
     "@netlify/remix-runtime": "^2.3.1",
     "@remix-run/react": "^2.12.0",
     "@shopify/hydrogen": "^2024.7.4",
+    "@shopify/shopify-api": "^12.3.0",
     "@vis.gl/react-google-maps": "^1.7.1",
     "clsx": "^2.1.1",
     "graphql": "^16.6.0",
@@ -31,6 +32,7 @@
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "resend": "^6.9.3",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
