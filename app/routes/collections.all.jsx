@@ -7,7 +7,7 @@ import {useState, useRef, useEffect} from 'react';
 import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
-export const meta = () => [{title: 'Katalog | Alla produkter'}];
+export const meta = () => [{title: 'Ljud & Bild Hörnan | Alla produkter'}];
 
 const SORT_OPTIONS = [
   {label: 'Rekommenderat',  key: 'RELEVANCE',    reverse: false},

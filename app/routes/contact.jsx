@@ -3,8 +3,14 @@ import { json } from "@remix-run/server-runtime";
 import { Form, useActionData } from "@remix-run/react";
 import { Resend } from 'resend';
 import { useTheme } from '~/components/PageLayout';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { useLoaderData } from "@remix-run/react";
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
+
+export async function loader() {
+  return json({ turnstileSiteKey: process.env.TURNSTILE_SITE_KEY });
+}
 
 export async function action({ request, context }) {
   const formData = await request.formData();
@@ -12,6 +18,27 @@ export async function action({ request, context }) {
   const email = formData.get("email");
   const subject = formData.get("subject");
   const message = formData.get("message");
+  const token = formData.get("cf-turnstile-response");
+
+  const verifyRes = await fetch(
+    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SITE_KEY,
+        response: token,
+      }),
+    }
+  );
+
+  const verifyData = await verifyRes.json();
+
+  if (!verifyData.success) {
+    return json({ error: 'Invalid token' }, { status: 400 });
+  }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -154,6 +181,7 @@ export async function action({ request, context }) {
 export default function ContactPage() {
   const actionData = useActionData();
   const { theme } = useTheme();
+  const { turnstileSiteKey } = useLoaderData();
 
   return (
     <>
@@ -624,6 +652,14 @@ export default function ContactPage() {
                   required
                 />
               </div>
+
+              <Turnstile
+                className='hidden!'
+                siteKey={turnstileSiteKey}
+                options={{
+                  theme: theme === 'dark' ? 'dark' : 'light',
+                }}
+              />
 
               <div className="cp-footer">
                 <button type="submit" className="cp-btn">

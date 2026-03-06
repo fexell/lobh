@@ -6,7 +6,7 @@ import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = ({data}) => [
-  {title: `${data?.blog.title ?? 'Blogg'} | Butiken`},
+  {title: `Ljud & Bild Hörnan | ${data?.blog.title ?? 'Blogg'}`},
 ];
 
 /** @param {LoaderFunctionArgs} args */
