@@ -4,6 +4,7 @@ import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import { LogoMarquee } from '~/components/LogoMarquee';
+import { useTheme } from '~/components/PageLayout';
 
 import Banner1 from '../assets/banner-4.jpg';
 import ContentImage1 from '../assets/banner-1.jpg';
@@ -114,18 +115,69 @@ export default function Homepage() {
   const homepage = data.homepage;
   const bestSeller = data.bestSellingProduct?.[0];
 
+  const { theme } = useTheme();
+
   return (
     <>
       <style>{`
+        /* ── Theme variables (content only) ── */
+        .hp[data-theme="dark"] {
+          --hp-bg:                    #111;
+          --hp-bg-alt:                #141414;
+          --hp-bg-deep:               #0d0d0d;
+          --hp-bg-card:               #1a1a1a;
+          --hp-bg-card-hover:         #1f1f1f;
+          --hp-text:                  rgba(255,255,255,0.75);
+          --hp-heading:               #fff;
+          --hp-muted:                 rgba(255,255,255,0.5);
+          --hp-dimmed:                rgba(255,255,255,0.4);
+          --hp-border:                rgba(255,255,255,0.05);
+          --hp-border-faint:          rgba(255,255,255,0.04);
+          --hp-accent:                #7AC9EF;
+          --hp-accent-hover:          #558da7;
+          --hp-btn-text:              #111;
+          --hp-btn-sec-color:         rgba(255,255,255,0.8);
+          --hp-btn-sec-border:        rgba(255,255,255,0.25);
+          --hp-btn-sec-border-hover:  rgba(255,255,255,0.6);
+          --hp-card-num:              rgba(201,184,122,0.15);
+          --hp-img-border:            rgba(201,184,122,0.15);
+          --hp-cms-border:            rgba(201,184,122,0.3);
+          --hp-cms-hr:                rgba(255,255,255,0.07);
+        }
+
+        .hp[data-theme="light"] {
+          --hp-bg:                    #f5f5f3;
+          --hp-bg-alt:                #ebebea;
+          --hp-bg-deep:               #e8e8e6;
+          --hp-bg-card:               #fff;
+          --hp-bg-card-hover:         #f9f9f8;
+          --hp-text:                  rgba(30,30,30,0.8);
+          --hp-heading:               #111;
+          --hp-muted:                 rgba(30,30,30,0.55);
+          --hp-dimmed:                rgba(30,30,30,0.8);
+          --hp-border:                rgba(0,0,0,0.07);
+          --hp-border-faint:          rgba(0,0,0,0.05);
+          --hp-accent:                #2a8ab5;
+          --hp-accent-hover:          #1d6a8a;
+          --hp-btn-text:              #fff;
+          --hp-btn-sec-color:         rgba(30,30,30,0.8);
+          --hp-btn-sec-border:        rgba(30,30,30,0.25);
+          --hp-btn-sec-border-hover:  rgba(30,30,30,0.7);
+          --hp-card-num:              rgba(100,80,20,0.1);
+          --hp-img-border:            rgba(100,80,20,0.12);
+          --hp-cms-border:            rgba(100,80,20,0.25);
+          --hp-cms-hr:                rgba(0,0,0,0.08);
+        }
+
         /* ── Globals for homepage ── */
         .hp {
           font-family: 'Montserrat', sans-serif;
-          background: #111;
-          color: rgba(255,255,255,0.75);
+          background: var(--hp-bg);
+          color: var(--hp-text);
           overflow-x: hidden;
         }
 
-        /* ── Hero ── */
+        /* ── Hero — always dark (photo background) ── */
         .hp-hero {
           position: relative;
           width: 100%;
@@ -176,6 +228,7 @@ export default function Homepage() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
+        /* Hero text is always white — dark photo underneath */
         .hp-hero-label {
           font-size: 10px;
           font-weight: 600;
@@ -221,12 +274,33 @@ export default function Homepage() {
           flex-wrap: wrap;
         }
 
+        /* Hero buttons are always dark-mode styled (over dark photo) */
+        .hp-hero-btns .hp-btn-primary {
+          background: #7AC9EF;
+          color: #111;
+        }
+
+        .hp-hero-btns .hp-btn-primary:hover {
+          background: #558da7;
+        }
+
+        .hp-hero-btns .hp-btn-secondary {
+          color: rgba(255,255,255,0.8);
+          border-color: rgba(255,255,255,0.25);
+        }
+
+        .hp-hero-btns .hp-btn-secondary:hover {
+          border-color: rgba(255,255,255,0.6);
+          color: #fff;
+        }
+
+        /* ── Shared buttons (outside hero, theme-aware) ── */
         .hp-btn-primary {
           display: inline-flex;
           align-items: center;
           padding: 14px 32px;
-          background: #7AC9EF;
-          color: #111;
+          background: var(--hp-accent);
+          color: var(--hp-btn-text);
           font-family: 'Montserrat', sans-serif;
           font-size: 10px;
           font-weight: 700;
@@ -238,7 +312,7 @@ export default function Homepage() {
         }
 
         .hp-btn-primary:hover {
-          background: #558da7;
+          background: var(--hp-accent-hover);
           transform: translateY(-1px);
         }
 
@@ -247,21 +321,21 @@ export default function Homepage() {
           align-items: center;
           padding: 14px 32px;
           background: transparent;
-          color: rgba(255,255,255,0.8);
+          color: var(--hp-btn-sec-color);
           font-family: 'Montserrat', sans-serif;
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           text-decoration: none;
-          border: 1px solid rgba(255,255,255,0.25);
+          border: 1px solid var(--hp-btn-sec-border);
           border-radius: 3px;
           transition: border-color 0.2s, color 0.2s;
         }
 
         .hp-btn-secondary:hover {
-          border-color: rgba(255,255,255,0.6);
-          color: #fff;
+          border-color: var(--hp-btn-sec-border-hover);
+          color: var(--hp-heading);
         }
 
         /* ── Section utility ── */
@@ -281,7 +355,7 @@ export default function Homepage() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--hp-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -293,7 +367,7 @@ export default function Homepage() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--hp-accent);
         }
 
         .hp-section-title {
@@ -301,7 +375,7 @@ export default function Homepage() {
           font-size: clamp(32px, 4vw, 52px);
           font-weight: 300;
           line-height: 1.15;
-          color: #fff;
+          color: var(--hp-heading);
           margin: 0 0 20px;
           letter-spacing: -0.01em;
         }
@@ -310,15 +384,15 @@ export default function Homepage() {
           font-size: 13px;
           font-weight: 300;
           line-height: 1.8;
-          color: rgba(255,255,255,0.5);
+          color: var(--hp-muted);
           max-width: 560px;
         }
 
         /* ── About / split section ── */
         .hp-about {
-          background: #141414;
-          border-top: 1px solid rgba(255,255,255,0.05);
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          background: var(--hp-bg-alt);
+          border-top: 1px solid var(--hp-border);
+          border-bottom: 1px solid var(--hp-border);
         }
 
         .hp-about-inner {
@@ -349,7 +423,7 @@ export default function Homepage() {
           content: '';
           position: absolute;
           inset: 0;
-          border: 1px solid rgba(201,184,122,0.15);
+          border: 1px solid var(--hp-img-border);
           border-radius: 4px;
           z-index: 1;
           pointer-events: none;
@@ -377,14 +451,14 @@ export default function Homepage() {
         .hp-divider {
           width: 40px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--hp-accent);
           opacity: 0.6;
         }
 
         /* ── Bestseller strip ── */
         .hp-bestseller {
-          background: #0d0d0d;
-          border-top: 1px solid rgba(255,255,255,0.04);
+          background: var(--hp-bg-deep);
+          border-top: 1px solid var(--hp-border-faint);
         }
 
         .hp-bestseller-inner {
@@ -409,7 +483,7 @@ export default function Homepage() {
           aspect-ratio: 1/1;
           overflow: hidden;
           border-radius: 4px;
-          background: #1a1a1a;
+          background: var(--hp-bg-card);
           position: relative;
         }
 
@@ -428,8 +502,8 @@ export default function Homepage() {
           position: absolute;
           top: 20px;
           left: 20px;
-          background: #7AC9EF;
-          color: #111;
+          background: var(--hp-accent);
+          color: var(--hp-btn-text);
           font-size: 8px;
           font-weight: 700;
           letter-spacing: 0.2em;
@@ -442,7 +516,7 @@ export default function Homepage() {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(28px, 3.5vw, 44px);
           font-weight: 400;
-          color: #fff;
+          color: var(--hp-heading);
           line-height: 1.2;
           margin: 0 0 12px;
         }
@@ -451,14 +525,14 @@ export default function Homepage() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 28px;
           font-weight: 300;
-          color: #7AC9EF;
+          color: var(--hp-accent);
           margin-bottom: 28px;
         }
 
         /* ── Why us / cards ── */
         .hp-why {
-          background: #141414;
-          border-top: 1px solid rgba(255,255,255,0.05);
+          background: var(--hp-bg-alt);
+          border-top: 1px solid var(--hp-border);
         }
 
         .hp-why-inner {
@@ -490,7 +564,7 @@ export default function Homepage() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--hp-accent);
         }
 
         .hp-cards {
@@ -504,7 +578,7 @@ export default function Homepage() {
         }
 
         .hp-card {
-          background: #1a1a1a;
+          background: var(--hp-bg-card);
           padding: 48px 36px;
           transition: background 0.2s;
           position: relative;
@@ -523,11 +597,11 @@ export default function Homepage() {
         }
 
         .hp-card:hover {
-          background: #1f1f1f;
+          background: var(--hp-bg-card-hover);
         }
 
         .hp-card:hover::before {
-          background: #7AC9EF;
+          background: var(--hp-accent);
         }
 
         .hp-card-img {
@@ -548,7 +622,7 @@ export default function Homepage() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 48px;
           font-weight: 300;
-          color: rgba(201,184,122,0.15);
+          color: var(--hp-card-num);
           line-height: 1;
           margin-bottom: 16px;
         }
@@ -557,7 +631,7 @@ export default function Homepage() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 24px;
           font-weight: 400;
-          color: #fff;
+          color: var(--hp-heading);
           margin-bottom: 12px;
         }
 
@@ -565,13 +639,13 @@ export default function Homepage() {
           font-size: 12px;
           font-weight: 300;
           line-height: 1.8;
-          color: rgba(255,255,255,0.4);
+          color: var(--hp-dimmed);
         }
 
         /* ── CMS content (from Shopify page) ── */
         .hp-cms {
-          background: #111;
-          border-top: 1px solid rgba(255,255,255,0.05);
+          background: var(--hp-bg);
+          border-top: 1px solid var(--hp-border);
         }
 
         .hp-cms-inner {
@@ -589,7 +663,7 @@ export default function Homepage() {
         .hp-cms-inner h3 {
           font-family: 'Cormorant Garamond', serif;
           font-weight: 300;
-          color: #fff;
+          color: var(--hp-heading);
           margin-top: 2em;
           margin-bottom: 0.5em;
         }
@@ -602,29 +676,29 @@ export default function Homepage() {
           font-size: 14px;
           font-weight: 300;
           line-height: 1.85;
-          color: rgba(255,255,255,0.5);
+          color: var(--hp-muted);
           margin-bottom: 1.2em;
         }
 
         .hp-cms-inner a {
-          color: #7AC9EF;
+          color: var(--hp-accent);
           text-decoration: none;
-          border-bottom: 1px solid rgba(201,184,122,0.3);
+          border-bottom: 1px solid var(--hp-cms-border);
           transition: border-color 0.15s;
         }
 
         .hp-cms-inner a:hover {
-          border-color: #7AC9EF;
+          border-color: var(--hp-accent);
         }
 
         .hp-cms-inner hr {
           border: none;
-          border-top: 1px solid rgba(255,255,255,0.07);
+          border-top: 1px solid var(--hp-cms-hr);
           margin: 2.5em 0;
         }
       `}</style>
 
-      <div className="hp">
+      <div className="hp" data-theme={theme}>
 
         {/* ── Hero ── */}
         <section className="hp-hero">

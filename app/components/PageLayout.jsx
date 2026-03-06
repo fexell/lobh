@@ -1,5 +1,5 @@
 import {Await, Link} from 'react-router-dom';
-import {Suspense, useId} from 'react';
+import {Suspense, useId, useRef, useState, useEffect, createContext, useContext} from 'react';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
@@ -10,6 +10,9 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 import { MyMobileMenu } from './MobileMenu';
+
+export const ThemeContext = createContext({ theme: 'dark', toggleTheme: () => {} });
+export const useTheme = () => useContext(ThemeContext);
 
 /**
  * @param {PageLayoutProps}
@@ -22,38 +25,60 @@ export function PageLayout({
   isLoggedIn,
   publicStoreDomain,
 }) {
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    const systemPrefers = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const resolved = saved || systemPrefers;
+
+    setTheme(resolved);
+    document.documentElement.setAttribute('data-theme', resolved);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(t => {
+      const next = t === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      document.documentElement.setAttribute('data-theme', next);
+      return next;
+    });
+  };
+
   return (
-    <Aside.Provider>
-      <CartAside cart={cart} />
-      <SearchAside />
-      <Aside type="mobile">
-        <MyMobileMenu header={header} publicStoreDomain={publicStoreDomain} primaryDomainUrl={header.shop.primaryDomain.url} />
-      </Aside>
-      {header && (
-        <Suspense fallback={null}>
-          <Await resolve={cart}>
-            {(cartData) => (
-            <Header
-              header={header}
-              cart={cartData}
-              isLoggedIn={isLoggedIn}
-              publicStoreDomain={publicStoreDomain}
-            />
-            )}
-          </Await>
-        </Suspense>
-      )}
-      <main className="flex flex-col items-center">
-        <div className="w-full">
-          {children}
-        </div>
-      </main>
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
-    </Aside.Provider>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <Aside.Provider>
+        <CartAside cart={cart} />
+        <SearchAside />
+        <Aside type="mobile">
+          <MyMobileMenu header={header} publicStoreDomain={publicStoreDomain} primaryDomainUrl={header.shop.primaryDomain.url} />
+        </Aside>
+        {header && (
+          <Suspense fallback={null}>
+            <Await resolve={cart}>
+              {(cartData) => (
+              <Header
+                header={header}
+                cart={cartData}
+                isLoggedIn={isLoggedIn}
+                publicStoreDomain={publicStoreDomain}
+              />
+              )}
+            </Await>
+          </Suspense>
+        )}
+        <main className="flex flex-col items-center">
+          <div className="w-full">
+            {children}
+          </div>
+        </main>
+        <Footer
+          footer={footer}
+          header={header}
+          publicStoreDomain={publicStoreDomain}
+        />
+      </Aside.Provider>
+    </ThemeContext.Provider>
   );
 }
 

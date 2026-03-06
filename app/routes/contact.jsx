@@ -2,6 +2,7 @@
 import { json } from "@remix-run/server-runtime";
 import { Form, useActionData } from "@remix-run/react";
 import { Resend } from 'resend';
+import { useTheme } from '~/components/PageLayout';
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
@@ -15,161 +16,214 @@ export async function action({ request, context }) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   await resend.emails.send({
-  from: 'onboarding@resend.dev',
-  to: process.env.CONTACT_FORM_TO,
-  subject: `Nytt kontaktformulärsmeddelande: ${subject}`,
-  html: `
-    <!DOCTYPE html>
-    <html lang="sv">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Nytt meddelande</title>
-    </head>
-    <body style="margin:0;padding:0;background:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    from: 'onboarding@resend.dev',
+    to: process.env.CONTACT_FORM_TO,
+    subject: `Nytt kontaktformulärsmeddelande: ${subject}`,
+    html: `
+      <!DOCTYPE html>
+      <html lang="sv">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Nytt meddelande</title>
+      </head>
+      <body style="margin:0;padding:0;background:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
 
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111111;padding:48px 24px;">
-        <tr>
-          <td align="center">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111111;padding:48px 24px;">
+          <tr>
+            <td align="center">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 
-              <!-- Header -->
-              <tr>
-                <td style="padding-bottom:32px;border-bottom:1px solid #222222;">
-                  <p style="margin:0 0 12px 0;font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#7AC9EF;">
-                    Ljud &amp; Bild Hörnan
-                  </p>
-                  <h1 style="margin:0;font-size:28px;font-weight:300;color:#ffffff;line-height:1.2;letter-spacing:-0.01em;">
-                    Nytt kontaktmeddelande
-                  </h1>
-                </td>
-              </tr>
+                <!-- Header -->
+                <tr>
+                  <td style="padding-bottom:32px;border-bottom:1px solid #222222;">
+                    <p style="margin:0 0 12px 0;font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#7AC9EF;">
+                      Ljud &amp; Bild Hörnan
+                    </p>
+                    <h1 style="margin:0;font-size:28px;font-weight:300;color:#ffffff;line-height:1.2;letter-spacing:-0.01em;">
+                      Nytt kontaktmeddelande
+                    </h1>
+                  </td>
+                </tr>
 
-              <!-- Fields -->
-              <tr>
-                <td style="padding:32px 0;">
-                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <!-- Fields -->
+                <tr>
+                  <td style="padding:32px 0;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
 
-                    <!-- Name -->
-                    <tr>
-                      <td style="padding-bottom:24px;">
-                        <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                          Namn
-                        </p>
-                        <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
-                          ${name}
-                        </p>
-                      </td>
-                    </tr>
+                      <!-- Name -->
+                      <tr>
+                        <td style="padding-bottom:24px;">
+                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                            Namn
+                          </p>
+                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
+                            ${name}
+                          </p>
+                        </td>
+                      </tr>
 
-                    <!-- Divider -->
-                    <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                    <tr><td style="padding-bottom:24px;"></td></tr>
+                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
+                      <tr><td style="padding-bottom:24px;"></td></tr>
 
-                    <!-- Email -->
-                    <tr>
-                      <td style="padding-bottom:24px;">
-                        <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                          E-post
-                        </p>
-                        <p style="margin:0;font-size:15px;font-weight:300;line-height:1.5;">
-                          <a href="mailto:${email}" style="color:#7AC9EF;text-decoration:none;">${email}</a>
-                        </p>
-                      </td>
-                    </tr>
+                      <!-- Email -->
+                      <tr>
+                        <td style="padding-bottom:24px;">
+                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                            E-post
+                          </p>
+                          <p style="margin:0;font-size:15px;font-weight:300;line-height:1.5;">
+                            <a href="mailto:${email}" style="color:#7AC9EF;text-decoration:none;">${email}</a>
+                          </p>
+                        </td>
+                      </tr>
 
-                    <!-- Divider -->
-                    <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                    <tr><td style="padding-bottom:24px;"></td></tr>
+                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
+                      <tr><td style="padding-bottom:24px;"></td></tr>
 
-                    <!-- Subject -->
-                    <tr>
-                      <td style="padding-bottom:24px;">
-                        <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                          Ämne
-                        </p>
-                        <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
-                          ${subject}
-                        </p>
-                      </td>
-                    </tr>
+                      <!-- Subject -->
+                      <tr>
+                        <td style="padding-bottom:24px;">
+                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                            Ämne
+                          </p>
+                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
+                            ${subject}
+                          </p>
+                        </td>
+                      </tr>
 
-                    <!-- Divider -->
-                    <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                    <tr><td style="padding-bottom:24px;"></td></tr>
+                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
+                      <tr><td style="padding-bottom:24px;"></td></tr>
 
-                    <!-- Message -->
-                    <tr>
-                      <td>
-                        <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                          Meddelande
-                        </p>
-                        <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.75;white-space:pre-wrap;">
-                          ${message}
-                        </p>
-                      </td>
-                    </tr>
+                      <!-- Message -->
+                      <tr>
+                        <td>
+                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                            Meddelande
+                          </p>
+                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.75;white-space:pre-wrap;">
+                            ${message}
+                          </p>
+                        </td>
+                      </tr>
 
-                  </table>
-                </td>
-              </tr>
+                    </table>
+                  </td>
+                </tr>
 
-              <!-- Reply CTA -->
-              <tr>
-                <td style="padding-top:8px;border-top:1px solid #222222;">
-                  <table cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                      <td style="padding-top:24px;">
-                        <a href="mailto:${email}"
-                           style="display:inline-block;padding:12px 28px;background:#7AC9EF;color:#111111;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;text-decoration:none;border-radius:3px;">
-                          Svara på meddelandet →
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
+                <!-- Reply CTA -->
+                <tr>
+                  <td style="padding-top:8px;border-top:1px solid #222222;">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding-top:24px;">
+                          <a href="mailto:${email}"
+                             style="display:inline-block;padding:12px 28px;background:#7AC9EF;color:#111111;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;text-decoration:none;border-radius:3px;">
+                            Svara på meddelandet →
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
 
-              <!-- Footer -->
-              <tr>
-                <td style="padding-top:40px;">
-                  <p style="margin:0;font-size:11px;font-weight:300;color:#444444;line-height:1.7;">
-                    Detta e-postmeddelande skickades automatiskt via kontaktformuläret på
-                    <a href="https://ljudochbildhornan.se" style="color:#555555;text-decoration:none;">ljudochbildhornan.se</a>.
-                  </p>
-                </td>
-              </tr>
+                <!-- Footer -->
+                <tr>
+                  <td style="padding-top:40px;">
+                    <p style="margin:0;font-size:11px;font-weight:300;color:#444444;line-height:1.7;">
+                      Detta e-postmeddelande skickades automatiskt via kontaktformuläret på
+                      <a href="https://ljudochbildhornan.se" style="color:#555555;text-decoration:none;">ljudochbildhornan.se</a>.
+                    </p>
+                  </td>
+                </tr>
 
-            </table>
-          </td>
-        </tr>
-      </table>
+              </table>
+            </td>
+          </tr>
+        </table>
 
-    </body>
-    </html>
-  `
-});
+      </body>
+      </html>
+    `
+  });
 
   return json({ success: true });
 }
 
 export default function ContactPage() {
   const actionData = useActionData();
+  const { theme } = useTheme();
 
   return (
     <>
       <style>{`
+        /* ── Theme variables ── */
+        .cp[data-theme="dark"] {
+          --cp-bg:                #111;
+          --cp-bg-header:         #0d0d0d;
+          --cp-text:              rgba(255,255,255,0.75);
+          --cp-heading:           #fff;
+          --cp-heading-em:        rgba(255,255,255,0.65);
+          --cp-subtitle:          rgba(255,255,255,0.4);
+          --cp-border:            rgba(255,255,255,0.05);
+          --cp-accent:            #7AC9EF;
+          --cp-accent-hover:      #558da7;
+          --cp-accent-btn-text:   #111;
+          --cp-info-value:        rgba(255,255,255,0.85);
+          --cp-info-note:         rgba(255,255,255,0.35);
+          --cp-divider:           rgba(122,201,239,0.3);
+          --cp-label:             rgba(255,255,255,0.35);
+          --cp-label-focus:       #7AC9EF;
+          --cp-input-color:       rgba(255,255,255,0.85);
+          --cp-input-placeholder: rgba(255,255,255,0.18);
+          --cp-input-border:      rgba(255,255,255,0.12);
+          --cp-input-border-focus:#7AC9EF;
+          --cp-select-option-bg:  #1a1a1a;
+          --cp-select-arrow:      rgba(255,255,255,0.2);
+          --cp-sent-title:        #fff;
+          --cp-sent-sub:          rgba(255,255,255,0.4);
+        }
+
+        .cp[data-theme="light"] {
+          --cp-bg:                #f5f5f3;
+          --cp-bg-header:         #ebebea;
+          --cp-text:              rgba(30,30,30,0.8);
+          --cp-heading:           #111;
+          --cp-heading-em:        rgba(30,30,30,0.5);
+          --cp-subtitle:          rgba(30,30,30,0.45);
+          --cp-border:            rgba(0,0,0,0.07);
+          --cp-accent:            #2a8ab5;
+          --cp-accent-hover:      #1d6a8a;
+          --cp-accent-btn-text:   #fff;
+          --cp-info-value:        rgba(30,30,30,0.85);
+          --cp-info-note:         rgba(30,30,30,0.6);
+          --cp-divider:           rgba(42,138,181,0.25);
+          --cp-label:             rgba(30,30,30,0.4);
+          --cp-label-focus:       #2a8ab5;
+          --cp-input-color:       rgba(30,30,30,0.85);
+          --cp-input-placeholder: rgba(30,30,30,0.5);
+          --cp-input-border:      rgba(0,0,0,0.15);
+          --cp-input-border-focus:#2a8ab5;
+          --cp-select-option-bg:  #fff;
+          --cp-select-arrow:      rgba(30,30,30,0.25);
+          --cp-sent-title:        #111;
+          --cp-sent-sub:          rgba(30,30,30,0.45);
+        }
+
+        /* ── Base ── */
         .cp {
           font-family: 'Montserrat', sans-serif;
-          background: #111;
-          color: rgba(255,255,255,0.75);
+          background: var(--cp-bg);
+          color: var(--cp-text);
           min-height: 80vh;
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ── Page header banner ── */
         .cp-header {
-          background: #0d0d0d;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          background: var(--cp-bg-header);
+          border-bottom: 1px solid var(--cp-border);
           padding: 72px 48px 64px;
           text-align: center;
         }
@@ -186,7 +240,7 @@ export default function ContactPage() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--cp-accent);
           margin-bottom: 20px;
         }
 
@@ -196,7 +250,7 @@ export default function ContactPage() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--cp-accent);
         }
 
         .cp-title {
@@ -204,21 +258,21 @@ export default function ContactPage() {
           font-size: clamp(36px, 5vw, 64px);
           font-weight: 300;
           line-height: 1.1;
-          color: #fff;
+          color: var(--cp-heading);
           margin: 0 0 20px;
           letter-spacing: -0.01em;
         }
 
         .cp-title em {
           font-style: italic;
-          color: rgba(255,255,255,0.65);
+          color: var(--cp-heading-em);
         }
 
         .cp-subtitle {
           font-size: 13px;
           font-weight: 300;
           line-height: 1.75;
-          color: rgba(255,255,255,0.4);
+          color: var(--cp-subtitle);
           max-width: 420px;
           margin: 0 auto;
         }
@@ -261,7 +315,7 @@ export default function ContactPage() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--cp-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -273,28 +327,28 @@ export default function ContactPage() {
           display: inline-block;
           width: 20px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--cp-accent);
         }
 
         .cp-info-value {
           font-family: 'Cormorant Garamond', serif;
           font-size: 22px;
           font-weight: 300;
-          color: rgba(255,255,255,0.85);
+          color: var(--cp-info-value);
           line-height: 1.4;
         }
 
         .cp-info-note {
           font-size: 11px;
           font-weight: 300;
-          color: rgba(255,255,255,0.35);
+          color: var(--cp-info-note);
           line-height: 1.7;
         }
 
         .cp-divider {
           width: 40px;
           height: 1px;
-          background: rgba(122, 201, 239, 0.3);
+          background: var(--cp-divider);
         }
 
         /* ── Right: form ── */
@@ -325,12 +379,12 @@ export default function ContactPage() {
           font-weight: 700;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.35);
+          color: var(--cp-label);
           transition: color 0.2s;
         }
 
         .cp-field:focus-within .cp-label {
-          color: #7AC9EF;
+          color: var(--cp-label-focus);
         }
 
         .cp-input,
@@ -341,27 +395,27 @@ export default function ContactPage() {
           font-family: 'Montserrat', sans-serif;
           font-size: 13px;
           font-weight: 300;
-          color: rgba(255,255,255,0.85);
+          color: var(--cp-input-color);
           background: transparent;
           border: none;
-          border-bottom: 1px solid rgba(255,255,255,0.12);
+          border-bottom: 1px solid var(--cp-input-border);
           border-radius: 0;
           outline: none;
           box-sizing: border-box;
           transition: border-color 0.2s;
-          caret-color: #7AC9EF;
+          caret-color: var(--cp-accent);
         }
 
         .cp-input::placeholder,
         .cp-textarea::placeholder {
-          color: rgba(255,255,255,0.18);
+          color: var(--cp-input-placeholder);
           font-weight: 300;
         }
 
         .cp-input:focus,
         .cp-select:focus,
         .cp-textarea:focus {
-          border-bottom-color: #7AC9EF;
+          border-bottom-color: var(--cp-input-border-focus);
         }
 
         .cp-select {
@@ -370,8 +424,8 @@ export default function ContactPage() {
         }
 
         .cp-select option {
-          background: #1a1a1a;
-          color: rgba(255,255,255,0.85);
+          background: var(--cp-select-option-bg);
+          color: var(--cp-input-color);
         }
 
         .cp-select-wrap {
@@ -384,7 +438,7 @@ export default function ContactPage() {
           top: 50%;
           transform: translateY(-50%);
           pointer-events: none;
-          color: rgba(255,255,255,0.2);
+          color: var(--cp-select-arrow);
           font-size: 9px;
         }
 
@@ -401,7 +455,7 @@ export default function ContactPage() {
           gap: 24px;
           flex-wrap: wrap;
           padding-top: 8px;
-          border-top: 1px solid rgba(255,255,255,0.05);
+          border-top: 1px solid var(--cp-border);
         }
 
         .cp-btn {
@@ -409,8 +463,8 @@ export default function ContactPage() {
           align-items: center;
           gap: 10px;
           padding: 14px 36px;
-          background: #7AC9EF;
-          color: #111;
+          background: var(--cp-accent);
+          color: var(--cp-accent-btn-text);
           font-family: 'Montserrat', sans-serif;
           font-size: 10px;
           font-weight: 700;
@@ -423,7 +477,7 @@ export default function ContactPage() {
         }
 
         .cp-btn:hover {
-          background: #558da7;
+          background: var(--cp-accent-hover);
           transform: translateY(-1px);
         }
 
@@ -440,14 +494,14 @@ export default function ContactPage() {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #7AC9EF;
+          background: var(--cp-accent);
         }
 
         .cp-sent-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(28px, 4vw, 40px);
           font-weight: 300;
-          color: #fff;
+          color: var(--cp-sent-title);
           margin: 0;
           line-height: 1.2;
         }
@@ -455,7 +509,7 @@ export default function ContactPage() {
         .cp-sent-sub {
           font-size: 13px;
           font-weight: 300;
-          color: rgba(255,255,255,0.4);
+          color: var(--cp-sent-sub);
           margin: 0;
           line-height: 1.75;
         }
@@ -466,7 +520,7 @@ export default function ContactPage() {
         }
       `}</style>
 
-      <div className="cp">
+      <div className="cp" data-theme={theme}>
 
         {/* ── Page header ── */}
         <div className="cp-header">
@@ -482,7 +536,7 @@ export default function ContactPage() {
         {/* ── Body: info + form ── */}
         <div className="cp-body">
 
-          {/* Left: contact info — always visible */}
+          {/* Left: contact info */}
           <div className="cp-info">
             <div className="cp-info-block">
               <div className="cp-info-label">E-post</div>

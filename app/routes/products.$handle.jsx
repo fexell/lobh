@@ -10,6 +10,7 @@ import {getVariantUrl} from '~/lib/variants';
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
+import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = ({data}) => [
@@ -81,52 +82,110 @@ function redirectToFirstVariant({product, request}) {
 
 export default function Product() {
   const {product, variants} = useLoaderData();
+  const {theme} = useTheme();
   const selectedVariant = useOptimisticVariant(product.selectedVariant, variants);
   const {title, descriptionHtml, vendor} = product;
-  const [zoom, setZoom] = useState({
-    active: false,
-    x: 0,
-    y: 0,
-    scale: 2.5,
-  });
+  const [zoom, setZoom] = useState({active: false, x: 0, y: 0, scale: 2.5});
   const imgRef = useRef(null);
 
   useEffect(() => {
     function checkMouse(e) {
-      if(!imgRef.current) return;
-      
+      if (!imgRef.current) return;
       const rect = imgRef.current.getBoundingClientRect();
       const inside =
         e.clientX >= rect.left &&
         e.clientX <= rect.right &&
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom;
-
-      if(inside) {
+      if (inside) {
         const x = (e.clientX - rect.left) / rect.width;
         const y = (e.clientY - rect.top) / rect.height;
         setZoom((z) => ({...z, active: true, x, y}));
       }
     }
-
     window.addEventListener('mousemove', checkMouse);
     return () => window.removeEventListener('mousemove', checkMouse);
-  }, [])
+  }, []);
 
   return (
     <>
       <style>{`
-        :root {
-          --accent: #7AC9EF;
-          --accent-dim: rgba(122, 201, 239, 0.1);
-          --accent-border: rgba(122, 201, 239, 0.3);
+        /* ── Theme variables ── */
+        .pp[data-theme="dark"] {
+          --pp-bg:                  #111;
+          --pp-bg-img:              #1a1a1a;
+          --pp-text:                rgba(255,255,255,0.75);
+          --pp-heading:             #fff;
+          --pp-muted:               rgba(255,255,255,0.45);
+          --pp-dimmed:              rgba(255,255,255,0.28);
+          --pp-faint:               rgba(255,255,255,0.12);
+          --pp-border:              rgba(255,255,255,0.07);
+          --pp-border-img:          rgba(255,255,255,0.06);
+          --pp-accent:              #7AC9EF;
+          --pp-accent-dim:          rgba(122,201,239,0.1);
+          --pp-accent-border:       rgba(122,201,239,0.3);
+          --pp-accent-hover:        #9dd8f4;
+          --pp-accent-text:         #0d1a22;
+          --pp-breadcrumb:          rgba(255,255,255,0.28);
+          --pp-breadcrumb-sep:      rgba(255,255,255,0.12);
+          --pp-breadcrumb-cur:      rgba(255,255,255,0.45);
+          --pp-price-color:         #fff;
+          --pp-compare-color:       rgba(255,255,255,0.3);
+          --pp-meta-label:          rgba(255,255,255,0.2);
+          --pp-meta-value:          rgba(255,255,255,0.6);
+          --pp-in-stock:            #7AC9EF;
+          --pp-out-of-stock:        rgba(255,255,255,0.25);
+          --pp-desc-label:          rgba(255,255,255,0.25);
+          --pp-desc-divider:        rgba(255,255,255,0.06);
+          --pp-desc-body:           rgba(255,255,255,0.45);
+          --pp-desc-strong:         rgba(255,255,255,0.65);
+          --pp-opt-color:           rgba(255,255,255,0.6);
+          --pp-opt-border:          rgba(255,255,255,0.12);
+          --pp-atc-disabled-bg:     rgba(255,255,255,0.1);
+          --pp-atc-disabled-color:  rgba(255,255,255,0.25);
         }
 
+        .pp[data-theme="light"] {
+          --pp-bg:                  #f5f5f3;
+          --pp-bg-img:              #fff;
+          --pp-text:                rgba(30,30,30,0.8);
+          --pp-heading:             #111;
+          --pp-muted:               rgba(30,30,30,0.5);
+          --pp-dimmed:              rgba(30,30,30,0.4);
+          --pp-faint:               rgba(0,0,0,0.1);
+          --pp-border:              rgba(0,0,0,0.08);
+          --pp-border-img:          rgba(0,0,0,0.07);
+          --pp-accent:              #2a8ab5;
+          --pp-accent-dim:          rgba(42,138,181,0.08);
+          --pp-accent-border:       rgba(42,138,181,0.3);
+          --pp-accent-hover:        #1d6a8a;
+          --pp-accent-text:         #fff;
+          --pp-breadcrumb:          rgba(30,30,30,0.35);
+          --pp-breadcrumb-sep:      rgba(30,30,30,0.2);
+          --pp-breadcrumb-cur:      rgba(30,30,30,0.6);
+          --pp-price-color:         #111;
+          --pp-compare-color:       rgba(30,30,30,0.35);
+          --pp-meta-label:          rgba(30,30,30,0.3);
+          --pp-meta-value:          rgba(30,30,30,0.65);
+          --pp-in-stock:            #2a8ab5;
+          --pp-out-of-stock:        rgba(30,30,30,0.3);
+          --pp-desc-label:          rgba(30,30,30,0.3);
+          --pp-desc-divider:        rgba(0,0,0,0.07);
+          --pp-desc-body:           rgba(30,30,30,0.55);
+          --pp-desc-strong:         rgba(30,30,30,0.75);
+          --pp-opt-color:           rgba(30,30,30,0.65);
+          --pp-opt-border:          rgba(0,0,0,0.14);
+          --pp-atc-disabled-bg:     rgba(0,0,0,0.08);
+          --pp-atc-disabled-color:  rgba(30,30,30,0.3);
+        }
+
+        /* ── Base ── */
         .pp {
-          background: #111;
+          background: var(--pp-bg);
           min-height: 100vh;
           font-family: 'Montserrat', sans-serif;
-          color: rgba(255,255,255,0.75);
+          color: var(--pp-text);
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ── Breadcrumb ── */
@@ -148,16 +207,16 @@ export default function Product() {
           font-weight: 400;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.28);
+          color: var(--pp-breadcrumb);
           text-decoration: none;
           transition: color 0.15s;
         }
 
-        .pp-breadcrumb a:hover { color: var(--accent); }
+        .pp-breadcrumb a:hover { color: var(--pp-accent); }
 
         .pp-breadcrumb-sep {
           font-size: 10px;
-          color: rgba(255,255,255,0.12);
+          color: var(--pp-breadcrumb-sep);
         }
 
         .pp-breadcrumb-current {
@@ -165,7 +224,7 @@ export default function Product() {
           font-weight: 400;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.45);
+          color: var(--pp-breadcrumb-cur);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -197,14 +256,13 @@ export default function Product() {
           top: 96px;
         }
 
-        /* .pp-img-main {
-          /* position: relative; */
+        .pp-img-main {
+          position: relative;
           overflow: hidden;
           border-radius: 4px;
-          background: #1a1a1a;
-          border: 1px solid rgba(255,255,255,0.06);
-          aspect-ratio: 1 / 1;
-        } */
+          background: var(--pp-bg-img);
+          border: 1px solid var(--pp-border-img);
+        }
 
         /* Blue corner accent */
         .pp-img-main::before {
@@ -212,7 +270,7 @@ export default function Product() {
           position: absolute;
           top: 0; left: 0;
           width: 40px; height: 2px;
-          background: var(--accent);
+          background: var(--pp-accent);
           z-index: 1;
         }
 
@@ -221,23 +279,8 @@ export default function Product() {
           position: absolute;
           top: 0; left: 0;
           width: 2px; height: 40px;
-          background: var(--accent);
+          background: var(--pp-accent);
           z-index: 1;
-        }
-
-        /* Override ProductImage styles */
-        .pp-img-main img,
-        .pp-img-main > div,
-        .pp-img-main > * {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: contain !important;
-          display: block;
-        }
-
-        .pp-img-main {
-          position: relative;
-          overflow: hidden; /* viktigt! */
         }
 
         .pp-img-zoom-inner {
@@ -267,7 +310,7 @@ export default function Product() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: var(--accent);
+          color: var(--pp-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -279,14 +322,14 @@ export default function Product() {
           display: inline-block;
           width: 20px;
           height: 1px;
-          background: var(--accent);
+          background: var(--pp-accent);
         }
 
         .pp-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(32px, 4vw, 52px);
           font-weight: 300;
-          color: #fff;
+          color: var(--pp-heading);
           line-height: 1.1;
           letter-spacing: -0.01em;
           margin: 0 0 24px;
@@ -296,16 +339,15 @@ export default function Product() {
         .pp-price-wrap {
           margin-bottom: 32px;
           padding-bottom: 32px;
-          border-bottom: 1px solid rgba(255,255,255,0.07);
+          border-bottom: 1px solid var(--pp-border);
         }
 
-        /* Override ProductPrice component */
         .pp-price-wrap .price,
         .pp-price-wrap [data-test='price'] {
           font-family: 'Cormorant Garamond', serif !important;
           font-size: 36px !important;
           font-weight: 300 !important;
-          color: #fff !important;
+          color: var(--pp-price-color) !important;
           letter-spacing: 0.02em;
         }
 
@@ -314,7 +356,7 @@ export default function Product() {
           font-family: 'Montserrat', sans-serif !important;
           font-size: 14px !important;
           font-weight: 300 !important;
-          color: rgba(255,255,255,0.3) !important;
+          color: var(--pp-compare-color) !important;
           text-decoration: line-through !important;
           margin-left: 10px;
         }
@@ -323,9 +365,9 @@ export default function Product() {
           display: inline-block;
           margin-left: 12px;
           padding: 4px 10px;
-          background: var(--accent-dim);
-          border: 1px solid var(--accent-border);
-          color: var(--accent);
+          background: var(--pp-accent-dim);
+          border: 1px solid var(--pp-accent-border);
+          color: var(--pp-accent);
           font-size: 9px;
           font-weight: 700;
           letter-spacing: 0.16em;
@@ -334,28 +376,26 @@ export default function Product() {
           vertical-align: middle;
         }
 
-        /* ── Variant form (ProductForm) ── */
+        /* ── Variant form ── */
         .pp-form-wrap {
           margin-bottom: 32px;
         }
 
-        /* Option labels */
         .pp-form-wrap fieldset legend,
         .pp-form-wrap [data-option-name] {
           font-size: 10px !important;
           font-weight: 600 !important;
           letter-spacing: 0.16em !important;
           text-transform: uppercase !important;
-          color: rgba(255,255,255,0.35) !important;
+          color: var(--pp-meta-label) !important;
           margin-bottom: 10px !important;
           display: block;
         }
 
-        /* Variant option buttons (size/color selectors) */
         .pp-options button {
-          border: 1px solid rgba(255,255,255,0.12) !important;
+          border: 1px solid var(--pp-opt-border) !important;
           background: transparent !important;
-          color: rgba(255,255,255,0.6) !important;
+          color: var(--pp-opt-color) !important;
           font-family: 'Montserrat', sans-serif !important;
           font-size: 11px !important;
           font-weight: 400 !important;
@@ -367,61 +407,28 @@ export default function Product() {
         }
 
         .pp-options button:hover {
-          border-color: var(--accent-border) !important;
-          color: #fff !important;
-          background: var(--accent-dim) !important;
+          border-color: var(--pp-accent-border) !important;
+          color: var(--pp-heading) !important;
+          background: var(--pp-accent-dim) !important;
         }
 
         .pp-options button[aria-selected='true'],
         .pp-options button[data-selected='true'],
-        .pp-options button.selected,
-        .pp-options button[disabled] {
-          border-color: var(--accent) !important;
-          color: #fff !important;
-          background: var(--accent-dim) !important;
+        .pp-options button.selected {
+          border-color: var(--pp-accent) !important;
+          color: var(--pp-heading) !important;
+          background: var(--pp-accent-dim) !important;
         }
 
-        /* Add to cart button — wraps the AddToCartButton */
-        .pp-atc-wrap button {
-          width: 100% !important;
-          padding: 16px 32px !important;
-          background: var(--accent) !important;
-          color: #0d1a22 !important;
-          font-family: 'Montserrat', sans-serif !important;
-          font-size: 10px !important;
-          font-weight: 700 !important;
-          letter-spacing: 0.22em !important;
-          text-transform: uppercase !important;
-          border: none !important;
-          border-radius: 3px !important;
-          cursor: pointer !important;
-          transition: background 0.2s, transform 0.15s !important;
-          margin-top: 0 !important;
-          display: block !important;
-        }
-
-        .pp-atc-wrap button:hover {
-          background: #9dd8f4 !important;
-          transform: translateY(-1px) !important;
-        }
-
-        .pp-atc-wrap button:disabled {
-          background: rgba(255,255,255,0.1) !important;
-          color: rgba(255,255,255,0.25) !important;
-          cursor: not-allowed !important;
-          transform: none !important;
-        }
-
-
-        /* ProductForm renders option buttons + ATC button together.
-           The ATC button is always the LAST button in the form — target it specifically. */
+        /* Add to cart button */
+        .pp-atc-wrap button,
         .pp-options > form > button:last-of-type,
         .pp-options button[data-test='add-to-cart-button'],
         .pp-options .add-to-cart {
           width: 100% !important;
           padding: 16px 32px !important;
-          background: var(--accent) !important;
-          color: #0d1a22 !important;
+          background: var(--pp-accent) !important;
+          color: var(--pp-accent-text) !important;
           font-family: 'Montserrat', sans-serif !important;
           font-size: 10px !important;
           font-weight: 700 !important;
@@ -435,28 +442,30 @@ export default function Product() {
           display: block !important;
         }
 
+        .pp-atc-wrap button:hover,
         .pp-options > form > button:last-of-type:hover,
         .pp-options button[data-test='add-to-cart-button']:hover {
-          background: #9dd8f4 !important;
+          background: var(--pp-accent-hover) !important;
           transform: translateY(-1px) !important;
         }
 
+        .pp-atc-wrap button:disabled,
         .pp-options > form > button:last-of-type:disabled,
         .pp-options button[data-test='add-to-cart-button']:disabled {
-          background: rgba(255,255,255,0.1) !important;
-          color: rgba(255,255,255,0.25) !important;
+          background: var(--pp-atc-disabled-bg) !important;
+          color: var(--pp-atc-disabled-color) !important;
           cursor: not-allowed !important;
           transform: none !important;
         }
 
-        /* ── Meta row (SKU, availability) ── */
+        /* ── Meta row ── */
         .pp-meta {
           display: flex;
           gap: 24px;
           flex-wrap: wrap;
           padding: 20px 0;
-          border-top: 1px solid rgba(255,255,255,0.07);
-          border-bottom: 1px solid rgba(255,255,255,0.07);
+          border-top: 1px solid var(--pp-border);
+          border-bottom: 1px solid var(--pp-border);
           margin-bottom: 32px;
         }
 
@@ -471,23 +480,18 @@ export default function Product() {
           font-weight: 700;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
+          color: var(--pp-meta-label);
         }
 
         .pp-meta-value {
           font-size: 12px;
           font-weight: 400;
-          color: rgba(255,255,255,0.6);
+          color: var(--pp-meta-value);
           letter-spacing: 0.03em;
         }
 
-        .pp-meta-value.in-stock {
-          color: #7AC9EF;
-        }
-
-        .pp-meta-value.out-of-stock {
-          color: rgba(255,255,255,0.25);
-        }
+        .pp-meta-value.in-stock  { color: var(--pp-in-stock); }
+        .pp-meta-value.out-of-stock { color: var(--pp-out-of-stock); }
 
         /* ── Description ── */
         .pp-description {
@@ -499,7 +503,7 @@ export default function Product() {
           font-weight: 700;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.25);
+          color: var(--pp-desc-label);
           margin-bottom: 16px;
           display: flex;
           align-items: center;
@@ -510,14 +514,14 @@ export default function Product() {
           content: '';
           flex: 1;
           height: 1px;
-          background: rgba(255,255,255,0.06);
+          background: var(--pp-desc-divider);
         }
 
         .pp-description-body {
           font-size: 13px;
           font-weight: 300;
           line-height: 1.85;
-          color: rgba(255,255,255,0.45);
+          color: var(--pp-desc-body);
         }
 
         .pp-description-body p { margin-bottom: 1em; }
@@ -525,18 +529,18 @@ export default function Product() {
 
         .pp-description-body strong {
           font-weight: 500;
-          color: rgba(255,255,255,0.65);
+          color: var(--pp-desc-strong);
         }
 
         .pp-description-body a {
-          color: var(--accent);
+          color: var(--pp-accent);
           text-decoration: none;
-          border-bottom: 1px solid var(--accent-border);
+          border-bottom: 1px solid var(--pp-accent-border);
           transition: border-color 0.15s;
         }
 
         .pp-description-body a:hover {
-          border-color: var(--accent);
+          border-color: var(--pp-accent);
         }
 
         .pp-description-body ul,
@@ -550,7 +554,7 @@ export default function Product() {
         }
       `}</style>
 
-      <div className="pp">
+      <div className="pp" data-theme={theme}>
 
         {/* Breadcrumb */}
         <nav className="pp-breadcrumb">
@@ -581,7 +585,6 @@ export default function Product() {
                 const rect = e.currentTarget.getBoundingClientRect();
                 const x = (e.clientX - rect.left) / rect.width;
                 const y = (e.clientY - rect.top) / rect.height;
-
                 setZoom((z) => ({...z, x, y}));
               }}
             >
@@ -590,7 +593,7 @@ export default function Product() {
                 style={{
                   transform: zoom.active
                     ? `scale(${zoom.scale}) translate(${-zoom.x * 100 / zoom.scale}%, ${-zoom.y * 100 / zoom.scale}%)`
-                    : "scale(1) translate(0,0)",
+                    : 'scale(1) translate(0,0)',
                 }}
               >
                 <ProductImage image={selectedVariant?.image} />
@@ -601,13 +604,10 @@ export default function Product() {
           {/* Right: info */}
           <div className="pp-info">
 
-            {/* Vendor */}
             {vendor && <div className="pp-vendor">{vendor}</div>}
 
-            {/* Title */}
             <h1 className="pp-title">{title}</h1>
 
-            {/* Price */}
             <div className="pp-price-wrap">
               <ProductPrice
                 price={selectedVariant?.price}
@@ -618,10 +618,6 @@ export default function Product() {
               )}
             </div>
 
-            {/* Variant selector + Add to cart */}
-            {/* pp-options styles the variant selectors, pp-atc-wrap styles the button */}
-            {/* ProductForm renders both — we use CSS :last-child on pp-form-wrap to */}
-            {/* target the final button element rendered by AddToCartButton */}
             <div className="pp-form-wrap">
               <Suspense
                 fallback={
@@ -647,7 +643,6 @@ export default function Product() {
               </Suspense>
             </div>
 
-            {/* Meta */}
             <div className="pp-meta">
               <div className="pp-meta-item">
                 <span className="pp-meta-label">Tillgänglighet</span>
@@ -669,7 +664,6 @@ export default function Product() {
               )}
             </div>
 
-            {/* Description */}
             {descriptionHtml && (
               <div className="pp-description">
                 <div className="pp-description-label">Beskrivning</div>

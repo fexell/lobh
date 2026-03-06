@@ -2,6 +2,7 @@ import {defer} from '@netlify/remix-runtime';
 import {Link, useLoaderData} from '@remix-run/react';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction} */
 export const meta = () => [{title: 'Blogg | Butiken'}];
@@ -27,22 +28,60 @@ function loadDeferredData() {
 
 export default function Blogs() {
   const {blogs} = useLoaderData();
+  const {theme} = useTheme();
 
   return (
     <>
       <style>{`
+        /* ── Theme variables ── */
+        .bl-page[data-theme="dark"] {
+          --bl-bg:              #111;
+          --bl-bg-header:       #141414;
+          --bl-bg-card:         #1a1a1a;
+          --bl-bg-card-hover:   #1e1e1e;
+          --bl-heading:         #fff;
+          --bl-heading-hover:   rgba(255,255,255,0.85);
+          --bl-subtitle:        rgba(255,255,255,0.25);
+          --bl-border:          rgba(255,255,255,0.06);
+          --bl-accent:          #7AC9EF;
+          --bl-card-desc:       rgba(255,255,255,0.3);
+          --bl-cta-color:       rgba(255,255,255,0.2);
+          --bl-cta-arrow:       rgba(255,255,255,0.15);
+          --bl-empty-icon:      rgba(255,255,255,0.05);
+          --bl-empty-title:     rgba(255,255,255,0.3);
+        }
+
+        .bl-page[data-theme="light"] {
+          --bl-bg:              #f5f5f3;
+          --bl-bg-header:       #ebebea;
+          --bl-bg-card:         #fff;
+          --bl-bg-card-hover:   #f9f9f8;
+          --bl-heading:         #111;
+          --bl-heading-hover:   rgba(30,30,30,0.75);
+          --bl-subtitle:        rgba(30,30,30,0.35);
+          --bl-border:          rgba(0,0,0,0.07);
+          --bl-accent:          #2a8ab5;
+          --bl-card-desc:       rgba(30,30,30,0.4);
+          --bl-cta-color:       rgba(30,30,30,0.25);
+          --bl-cta-arrow:       rgba(30,30,30,0.15);
+          --bl-empty-icon:      rgba(0,0,0,0.05);
+          --bl-empty-title:     rgba(30,30,30,0.3);
+        }
+
+        /* ── Base ── */
         .bl-page {
-          background: #111;
+          background: var(--bl-bg);
           min-height: 100vh;
           font-family: 'Montserrat', sans-serif;
           display: flex;
           flex-direction: column;
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ── Header ── */
         .bl-header {
-          background: #141414;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--bl-bg-header);
+          border-bottom: 1px solid var(--bl-border);
           padding: 64px 48px 48px;
           flex-shrink: 0;
         }
@@ -61,7 +100,7 @@ export default function Blogs() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--bl-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -73,14 +112,14 @@ export default function Blogs() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--bl-accent);
         }
 
         .bl-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(36px, 5vw, 60px);
           font-weight: 300;
-          color: #fff;
+          color: var(--bl-heading);
           margin: 0 0 10px;
           letter-spacing: -0.01em;
           line-height: 1.1;
@@ -89,7 +128,7 @@ export default function Blogs() {
         .bl-subtitle {
           font-size: 12px;
           font-weight: 300;
-          color: rgba(255,255,255,0.25);
+          color: var(--bl-subtitle);
           letter-spacing: 0.06em;
         }
 
@@ -120,26 +159,25 @@ export default function Blogs() {
           justify-content: space-between;
           gap: 32px;
           padding: 32px 36px;
-          background: #1a1a1a;
+          background: var(--bl-bg-card);
           text-decoration: none;
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
         }
 
-        /* Blue left accent bar */
         .bl-card::before {
           content: '';
           position: absolute;
           top: 0; left: 0; bottom: 0;
           width: 2px;
-          background: #7AC9EF;
+          background: var(--bl-accent);
           transform: scaleY(0);
           transform-origin: bottom;
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .bl-card:hover { background: #1e1e1e; }
+        .bl-card:hover { background: var(--bl-bg-card-hover); }
         .bl-card:hover::before { transform: scaleY(1); }
 
         @media (max-width: 640px) {
@@ -159,14 +197,14 @@ export default function Blogs() {
           font-weight: 700;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--bl-accent);
         }
 
         .bl-card-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(22px, 2.8vw, 32px);
           font-weight: 300;
-          color: #fff;
+          color: var(--bl-heading);
           line-height: 1.2;
           letter-spacing: -0.01em;
           transition: color 0.2s;
@@ -175,14 +213,12 @@ export default function Blogs() {
           text-overflow: ellipsis;
         }
 
-        .bl-card:hover .bl-card-title {
-          color: rgba(255,255,255,0.85);
-        }
+        .bl-card:hover .bl-card-title { color: var(--bl-heading-hover); }
 
         .bl-card-desc {
           font-size: 12px;
           font-weight: 300;
-          color: rgba(255,255,255,0.3);
+          color: var(--bl-card-desc);
           line-height: 1.6;
           letter-spacing: 0.02em;
           display: -webkit-box;
@@ -201,7 +237,7 @@ export default function Blogs() {
           font-weight: 700;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
+          color: var(--bl-cta-color);
           transition: color 0.2s, gap 0.2s;
           white-space: nowrap;
         }
@@ -209,7 +245,7 @@ export default function Blogs() {
         .bl-card-cta-arrow {
           width: 32px;
           height: 1px;
-          background: rgba(255,255,255,0.15);
+          background: var(--bl-cta-arrow);
           position: relative;
           transition: width 0.25s ease, background 0.2s;
         }
@@ -221,24 +257,15 @@ export default function Blogs() {
           top: -3px;
           width: 6px;
           height: 6px;
-          border-right: 1px solid rgba(255,255,255,0.15);
-          border-top: 1px solid rgba(255,255,255,0.15);
+          border-right: 1px solid var(--bl-cta-arrow);
+          border-top: 1px solid var(--bl-cta-arrow);
           transform: rotate(45deg);
           transition: border-color 0.2s;
         }
 
-        .bl-card:hover .bl-card-cta {
-          color: #7AC9EF;
-        }
-
-        .bl-card:hover .bl-card-cta-arrow {
-          width: 48px;
-          background: #7AC9EF;
-        }
-
-        .bl-card:hover .bl-card-cta-arrow::after {
-          border-color: #7AC9EF;
-        }
+        .bl-card:hover .bl-card-cta            { color: var(--bl-accent); }
+        .bl-card:hover .bl-card-cta-arrow      { width: 48px; background: var(--bl-accent); }
+        .bl-card:hover .bl-card-cta-arrow::after { border-color: var(--bl-accent); }
 
         /* ── Empty state ── */
         .bl-empty {
@@ -249,7 +276,7 @@ export default function Blogs() {
         .bl-empty-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 72px;
-          color: rgba(255,255,255,0.05);
+          color: var(--bl-empty-icon);
           line-height: 1;
           margin-bottom: 20px;
         }
@@ -258,11 +285,11 @@ export default function Blogs() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 26px;
           font-weight: 300;
-          color: rgba(255,255,255,0.3);
+          color: var(--bl-empty-title);
         }
       `}</style>
 
-      <div className="bl-page">
+      <div className="bl-page" data-theme={theme}>
 
         {/* Header */}
         <div className="bl-header">

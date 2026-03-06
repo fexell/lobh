@@ -4,6 +4,7 @@ import {getPaginationVariables, Analytics, Image, Money} from '@shopify/hydrogen
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
 import {getEmptyPredictiveSearchResult} from '~/lib/search';
+import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction} */
 export const meta = () => [{title: 'Sök | Butiken'}];
@@ -26,6 +27,7 @@ export async function loader({request, context}) {
 
 export default function SearchPage() {
   const {type, term, result, error} = useLoaderData();
+  const {theme} = useTheme();
   if (type === 'predictive') return null;
 
   const hasResults = term && result?.total > 0;
@@ -33,18 +35,85 @@ export default function SearchPage() {
   return (
     <>
       <style>{`
+        /* ── Theme variables ── */
+        .srch-page[data-theme="dark"] {
+          --srch-bg:                #111;
+          --srch-bg-header:         #141414;
+          --srch-bg-card:           #1a1a1a;
+          --srch-bg-card-hover:     #1e1e1e;
+          --srch-bg-card-img:       #141414;
+          --srch-bg-card-noimg:     #181818;
+          --srch-heading:           #fff;
+          --srch-text:              rgba(255,255,255,0.7);
+          --srch-text-hover:        #fff;
+          --srch-border:            rgba(255,255,255,0.06);
+          --srch-border-card:       rgba(255,255,255,0.04);
+          --srch-accent:            #7AC9EF;
+          --srch-accent-text:       #0d1a22;
+          --srch-accent-hover:      #9dd8f4;
+          --srch-noimg-icon:        rgba(122,201,239,0.1);
+          --srch-input-bg:          rgba(255,255,255,0.04);
+          --srch-input-color:       #fff;
+          --srch-input-placeholder: rgba(255,255,255,0.2);
+          --srch-input-border:      rgba(255,255,255,0.1);
+          --srch-input-border-focus:rgba(122,201,239,0.5);
+          --srch-meta-color:        rgba(255,255,255,0.25);
+          --srch-meta-strong:       rgba(255,255,255,0.55);
+          --srch-list-type:         rgba(255,255,255,0.2);
+          --srch-empty-icon:        rgba(255,255,255,0.05);
+          --srch-empty-title:       rgba(255,255,255,0.3);
+          --srch-empty-sub:         rgba(255,255,255,0.18);
+          --srch-error-bg:          rgba(239,68,68,0.08);
+          --srch-error-border:      rgba(239,68,68,0.2);
+          --srch-error-color:       rgba(239,68,68,0.8);
+        }
+
+        .srch-page[data-theme="light"] {
+          --srch-bg:                #f5f5f3;
+          --srch-bg-header:         #ebebea;
+          --srch-bg-card:           #fff;
+          --srch-bg-card-hover:     #f9f9f8;
+          --srch-bg-card-img:       #e8e8e6;
+          --srch-bg-card-noimg:     #f0f0ee;
+          --srch-heading:           #111;
+          --srch-text:              rgba(30,30,30,0.7);
+          --srch-text-hover:        #111;
+          --srch-border:            rgba(0,0,0,0.07);
+          --srch-border-card:       rgba(0,0,0,0.05);
+          --srch-accent:            #2a8ab5;
+          --srch-accent-text:       #fff;
+          --srch-accent-hover:      #1d6a8a;
+          --srch-noimg-icon:        rgba(42,138,181,0.12);
+          --srch-input-bg:          rgba(0,0,0,0.02);
+          --srch-input-color:       #111;
+          --srch-input-placeholder: rgba(30,30,30,0.25);
+          --srch-input-border:      rgba(0,0,0,0.12);
+          --srch-input-border-focus:rgba(42,138,181,0.5);
+          --srch-meta-color:        rgba(30,30,30,0.35);
+          --srch-meta-strong:       rgba(30,30,30,0.65);
+          --srch-list-type:         rgba(30,30,30,0.25);
+          --srch-empty-icon:        rgba(0,0,0,0.05);
+          --srch-empty-title:       rgba(30,30,30,0.3);
+          --srch-empty-sub:         rgba(30,30,30,0.2);
+          --srch-error-bg:          rgba(239,68,68,0.06);
+          --srch-error-border:      rgba(239,68,68,0.18);
+          --srch-error-color:       rgba(200,40,40,0.85);
+        }
+
+        /* ── Base ── */
         .srch-page {
-          background: #111;
+          background: var(--srch-bg);
           min-height: calc(100vh - 110px);
           font-family: 'Montserrat', sans-serif;
           display: flex;
           flex-direction: column;
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ── Header ── */
         .srch-header {
-          background: #141414;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--srch-bg-header);
+          border-bottom: 1px solid var(--srch-border);
           padding: 64px 48px 48px;
           flex-shrink: 0;
         }
@@ -63,7 +132,7 @@ export default function SearchPage() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--srch-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -75,14 +144,14 @@ export default function SearchPage() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--srch-accent);
         }
 
         .srch-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(36px, 5vw, 60px);
           font-weight: 300;
-          color: #fff;
+          color: var(--srch-heading);
           margin: 0 0 32px;
           letter-spacing: -0.01em;
           line-height: 1.1;
@@ -92,35 +161,35 @@ export default function SearchPage() {
         .srch-form-wrap {
           display: flex;
           gap: 0;
-          border: 1px solid rgba(255,255,255,0.1);
+          border: 1px solid var(--srch-input-border);
           border-radius: 3px;
           overflow: hidden;
           transition: border-color 0.2s;
         }
 
         .srch-form-wrap:focus-within {
-          border-color: rgba(122,201,239,0.5);
+          border-color: var(--srch-input-border-focus);
         }
 
         .srch-input {
           flex: 1;
-          background: rgba(255,255,255,0.04);
+          background: var(--srch-input-bg);
           border: none;
           outline: none;
           padding: 16px 20px;
           font-family: 'Montserrat', sans-serif;
           font-size: 13px;
           font-weight: 300;
-          color: #fff;
+          color: var(--srch-input-color);
           letter-spacing: 0.04em;
         }
 
         .srch-input::placeholder {
-          color: rgba(255,255,255,0.2);
+          color: var(--srch-input-placeholder);
         }
 
         .srch-submit {
-          background: #7AC9EF;
+          background: var(--srch-accent);
           border: none;
           padding: 0 28px;
           font-family: 'Montserrat', sans-serif;
@@ -128,7 +197,7 @@ export default function SearchPage() {
           font-weight: 700;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #0d1a22;
+          color: var(--srch-accent-text);
           cursor: pointer;
           transition: background 0.2s;
           white-space: nowrap;
@@ -136,7 +205,7 @@ export default function SearchPage() {
         }
 
         .srch-submit:hover {
-          background: #9dd8f4;
+          background: var(--srch-accent-hover);
         }
 
         /* ── Body ── */
@@ -156,18 +225,18 @@ export default function SearchPage() {
         .srch-meta {
           font-size: 11px;
           font-weight: 300;
-          color: rgba(255,255,255,0.25);
+          color: var(--srch-meta-color);
           letter-spacing: 0.08em;
           margin-bottom: 40px;
           padding-bottom: 20px;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          border-bottom: 1px solid var(--srch-border);
           display: flex;
           align-items: center;
           gap: 10px;
         }
 
         .srch-meta strong {
-          color: rgba(255,255,255,0.55);
+          color: var(--srch-meta-strong);
           font-weight: 500;
         }
 
@@ -177,7 +246,7 @@ export default function SearchPage() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--srch-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -185,16 +254,14 @@ export default function SearchPage() {
           margin-top: 48px;
         }
 
-        .srch-section-heading:first-child {
-          margin-top: 0;
-        }
+        .srch-section-heading:first-child { margin-top: 0; }
 
         .srch-section-heading::before {
           content: '';
           display: inline-block;
           width: 20px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--srch-accent);
         }
 
         /* ── Product grid ── */
@@ -216,7 +283,7 @@ export default function SearchPage() {
         .srch-product-card {
           display: block;
           text-decoration: none;
-          background: #1a1a1a;
+          background: var(--srch-bg-card);
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
@@ -227,20 +294,20 @@ export default function SearchPage() {
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: #7AC9EF;
+          background: var(--srch-accent);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
           z-index: 1;
         }
 
-        .srch-product-card:hover { background: #1e1e1e; }
+        .srch-product-card:hover { background: var(--srch-bg-card-hover); }
         .srch-product-card:hover::before { transform: scaleX(1); }
 
         .srch-product-img {
           aspect-ratio: 1/1;
           overflow: hidden;
-          background: #141414;
+          background: var(--srch-bg-card-img);
         }
 
         .srch-product-img img {
@@ -257,14 +324,14 @@ export default function SearchPage() {
 
         .srch-product-info {
           padding: 16px 18px 20px;
-          border-top: 1px solid rgba(255,255,255,0.04);
+          border-top: 1px solid var(--srch-border-card);
         }
 
         .srch-product-title {
           font-size: 11px;
           font-weight: 500;
           letter-spacing: 0.04em;
-          color: rgba(255,255,255,0.7);
+          color: var(--srch-text);
           margin-bottom: 6px;
           white-space: nowrap;
           overflow: hidden;
@@ -272,13 +339,13 @@ export default function SearchPage() {
           transition: color 0.2s;
         }
 
-        .srch-product-card:hover .srch-product-title { color: #fff; }
+        .srch-product-card:hover .srch-product-title { color: var(--srch-text-hover); }
 
         .srch-product-price {
           font-family: 'Cormorant Garamond', serif;
           font-size: 17px;
           font-weight: 300;
-          color: #7AC9EF;
+          color: var(--srch-accent);
         }
 
         /* ── Pages / Articles list ── */
@@ -294,30 +361,30 @@ export default function SearchPage() {
           align-items: center;
           justify-content: space-between;
           padding: 16px 20px;
-          background: #1a1a1a;
+          background: var(--srch-bg-card);
           text-decoration: none;
           transition: background 0.2s;
           gap: 16px;
         }
 
-        .srch-list-item:hover { background: #1e1e1e; }
+        .srch-list-item:hover { background: var(--srch-bg-card-hover); }
 
         .srch-list-title {
           font-size: 13px;
           font-weight: 300;
-          color: rgba(255,255,255,0.7);
+          color: var(--srch-text);
           letter-spacing: 0.02em;
           transition: color 0.2s;
         }
 
-        .srch-list-item:hover .srch-list-title { color: #fff; }
+        .srch-list-item:hover .srch-list-title { color: var(--srch-text-hover); }
 
         .srch-list-type {
           font-size: 9px;
           font-weight: 700;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
+          color: var(--srch-list-type);
           flex-shrink: 0;
         }
 
@@ -330,7 +397,7 @@ export default function SearchPage() {
         .srch-empty-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 72px;
-          color: rgba(255,255,255,0.05);
+          color: var(--srch-empty-icon);
           line-height: 1;
           margin-bottom: 24px;
         }
@@ -339,14 +406,14 @@ export default function SearchPage() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 28px;
           font-weight: 300;
-          color: rgba(255,255,255,0.3);
+          color: var(--srch-empty-title);
           margin-bottom: 10px;
         }
 
         .srch-empty-sub {
           font-size: 11px;
           font-weight: 300;
-          color: rgba(255,255,255,0.18);
+          color: var(--srch-empty-sub);
           letter-spacing: 0.08em;
           text-transform: uppercase;
         }
@@ -354,17 +421,17 @@ export default function SearchPage() {
         /* ── Error ── */
         .srch-error {
           padding: 20px 24px;
-          background: rgba(239,68,68,0.08);
-          border: 1px solid rgba(239,68,68,0.2);
+          background: var(--srch-error-bg);
+          border: 1px solid var(--srch-error-border);
           border-radius: 3px;
           font-size: 12px;
-          color: rgba(239,68,68,0.8);
+          color: var(--srch-error-color);
           margin-bottom: 32px;
           letter-spacing: 0.03em;
         }
       `}</style>
 
-      <div className="srch-page">
+      <div className="srch-page" data-theme={theme}>
 
         {/* Header */}
         <div className="srch-header">
@@ -374,7 +441,6 @@ export default function SearchPage() {
               {term ? <>Resultat för <em style={{fontStyle:'italic'}}>"{term}"</em></> : 'Sök i butiken'}
             </h1>
 
-            {/* Search form */}
             <SearchForm>
               {({inputRef}) => (
                 <div className="srch-form-wrap">
@@ -442,8 +508,8 @@ export default function SearchPage() {
                                       sizes="(min-width: 45em) 300px, 50vw"
                                     />
                                   ) : (
-                                    <div style={{width:'100%',height:'100%',background:'#181818',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                                      <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:'40px',color:'rgba(122,201,239,0.1)'}}>✦</span>
+                                    <div style={{width:'100%',height:'100%',background:'var(--srch-bg-card-noimg)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                                      <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:'40px',color:'var(--srch-noimg-icon)'}}>✦</span>
                                     </div>
                                   )}
                                 </div>

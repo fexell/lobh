@@ -2,6 +2,7 @@ import {defer} from '@netlify/remix-runtime';
 import {Link, useLoaderData} from '@remix-run/react';
 import {Image, getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = ({data}) => [
@@ -34,22 +35,66 @@ function loadDeferredData() {
 export default function Blog() {
   const {blog} = useLoaderData();
   const {articles} = blog;
+  const {theme} = useTheme();
 
   return (
     <>
       <style>{`
+        /* ── Theme variables ── */
+        .bh-page[data-theme="dark"] {
+          --bh-bg:              #111;
+          --bh-bg-header:       #141414;
+          --bh-bg-card:         #1a1a1a;
+          --bh-bg-card-hover:   #1e1e1e;
+          --bh-bg-card-img:     #141414;
+          --bh-bg-card-noimg:   #181818;
+          --bh-heading:         #fff;
+          --bh-heading-hover:   rgba(255,255,255,0.85);
+          --bh-border:          rgba(255,255,255,0.06);
+          --bh-border-card:     rgba(255,255,255,0.04);
+          --bh-accent:          #7AC9EF;
+          --bh-breadcrumb:      rgba(255,255,255,0.25);
+          --bh-breadcrumb-sep:  rgba(255,255,255,0.12);
+          --bh-breadcrumb-cur:  rgba(255,255,255,0.45);
+          --bh-card-date:       rgba(255,255,255,0.2);
+          --bh-card-author:     #7AC9EF;
+          --bh-noimg-icon:      rgba(122,201,239,0.08);
+        }
+
+        .bh-page[data-theme="light"] {
+          --bh-bg:              #f5f5f3;
+          --bh-bg-header:       #ebebea;
+          --bh-bg-card:         #fff;
+          --bh-bg-card-hover:   #f9f9f8;
+          --bh-bg-card-img:     #e8e8e6;
+          --bh-bg-card-noimg:   #f0f0ee;
+          --bh-heading:         #111;
+          --bh-heading-hover:   rgba(30,30,30,0.75);
+          --bh-border:          rgba(0,0,0,0.07);
+          --bh-border-card:     rgba(0,0,0,0.05);
+          --bh-accent:          #2a8ab5;
+          --bh-breadcrumb:      rgba(30,30,30,0.3);
+          --bh-breadcrumb-sep:  rgba(30,30,30,0.15);
+          --bh-breadcrumb-cur:  rgba(30,30,30,0.55);
+          --bh-card-date:       rgba(30,30,30,0.3);
+          --bh-card-author:     #2a8ab5;
+          --bh-noimg-icon:      rgba(42,138,181,0.1);
+        }
+
+        /* ── Base ── */
         .bh-page {
-          background: #111;
+          background: var(--bh-bg);
           min-height: 100vh;
           font-family: 'Montserrat', sans-serif;
           display: flex;
           flex-direction: column;
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ── Header ── */
         .bh-header {
-          background: #141414;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--bh-bg-header);
+          border-bottom: 1px solid var(--bh-border);
           padding: 64px 48px 48px;
         }
 
@@ -74,16 +119,23 @@ export default function Blog() {
           font-weight: 400;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.25);
+          color: var(--bh-breadcrumb);
           text-decoration: none;
           transition: color 0.15s;
         }
 
-        .bh-breadcrumb a:hover { color: #7AC9EF; }
+        .bh-breadcrumb a:hover { color: var(--bh-accent); }
 
         .bh-breadcrumb-sep {
           font-size: 10px;
-          color: rgba(255,255,255,0.12);
+          color: var(--bh-breadcrumb-sep);
+        }
+
+        .bh-breadcrumb-cur {
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--bh-breadcrumb-cur);
         }
 
         .bh-label {
@@ -91,7 +143,7 @@ export default function Blog() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--bh-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -103,14 +155,14 @@ export default function Blog() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--bh-accent);
         }
 
         .bh-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(36px, 5vw, 60px);
           font-weight: 300;
-          color: #fff;
+          color: var(--bh-heading);
           margin: 0;
           letter-spacing: -0.01em;
           line-height: 1.1;
@@ -129,7 +181,6 @@ export default function Blog() {
           .bh-body { padding: 40px 24px 72px; }
         }
 
-        /* Article grid */
         .bh-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -148,7 +199,7 @@ export default function Blog() {
         .bh-card {
           display: block;
           text-decoration: none;
-          background: #1a1a1a;
+          background: var(--bh-bg-card);
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
@@ -159,20 +210,20 @@ export default function Blog() {
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: #7AC9EF;
+          background: var(--bh-accent);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
           z-index: 1;
         }
 
-        .bh-card:hover { background: #1e1e1e; }
+        .bh-card:hover { background: var(--bh-bg-card-hover); }
         .bh-card:hover::before { transform: scaleX(1); }
 
         .bh-card-img {
           overflow: hidden;
           aspect-ratio: 3 / 2;
-          background: #141414;
+          background: var(--bh-bg-card-img);
         }
 
         .bh-card-img img {
@@ -192,7 +243,7 @@ export default function Blog() {
 
         .bh-card-no-img {
           aspect-ratio: 3 / 2;
-          background: #181818;
+          background: var(--bh-bg-card-noimg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -201,13 +252,13 @@ export default function Blog() {
         .bh-card-no-img-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 48px;
-          color: rgba(122,201,239,0.08);
+          color: var(--bh-noimg-icon);
           font-weight: 300;
         }
 
         .bh-card-body {
           padding: 22px 24px 26px;
-          border-top: 1px solid rgba(255,255,255,0.04);
+          border-top: 1px solid var(--bh-border-card);
         }
 
         .bh-card-meta {
@@ -222,7 +273,7 @@ export default function Blog() {
           font-weight: 400;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.2);
+          color: var(--bh-card-date);
         }
 
         .bh-card-author {
@@ -230,7 +281,7 @@ export default function Blog() {
           font-weight: 500;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--bh-card-author);
           opacity: 0.7;
         }
 
@@ -238,7 +289,7 @@ export default function Blog() {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(18px, 2vw, 24px);
           font-weight: 400;
-          color: #fff;
+          color: var(--bh-heading);
           line-height: 1.3;
           letter-spacing: 0;
           margin: 0;
@@ -246,11 +297,11 @@ export default function Blog() {
         }
 
         .bh-card:hover .bh-card-title {
-          color: rgba(255,255,255,0.85);
+          color: var(--bh-heading-hover);
         }
       `}</style>
 
-      <div className="bh-page">
+      <div className="bh-page" data-theme={theme}>
 
         {/* Header */}
         <div className="bh-header">
@@ -258,9 +309,7 @@ export default function Blog() {
             <nav className="bh-breadcrumb">
               <Link to="/blogs">Blogg</Link>
               <span className="bh-breadcrumb-sep">›</span>
-              <span style={{fontSize:'10px', letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(255,255,255,0.45)'}}>
-                {blog.title}
-              </span>
+              <span className="bh-breadcrumb-cur">{blog.title}</span>
             </nav>
             <div className="bh-label">Redaktion</div>
             <h1 className="bh-title">{blog.title}</h1>

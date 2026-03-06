@@ -1,4 +1,4 @@
-import {Suspense, useEffect, useId, useRef, useState} from 'react';
+import {Suspense, useEffect, useId, useRef, useState, createContext, useContext} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router-dom';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {Aside, useAside} from '~/components/Aside';
@@ -6,6 +6,7 @@ import {SearchInput} from './SearchInput';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCartShopping, faBars, faMagnifyingGlass, faUser} from '@fortawesome/free-solid-svg-icons';
 import Logo from '../assets/Logo - Squares Only.svg';
+import { useTheme } from './PageLayout';
 
 /**
  * @param {HeaderProps}
@@ -15,6 +16,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
   const {open} = useAside();
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -30,6 +32,64 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
   return (
     <>
       <style>{`
+        :root[data-theme="dark"] {
+          --bg-primary: #111;
+          --bg-secondary: #141414;
+          --bg-tertiary: #0d0d0d;
+          --bg-card: #1a1a1a;
+          --bg-card-hover: #1f1f1f;
+          --bg-nav: rgba(18,18,18,0.97);
+          --bg-announcement: #1a1a1a;
+          --color-text: rgba(255,255,255,0.75);
+          --color-heading: #fff;
+          --color-muted: rgba(255,255,255,0.5);
+          --color-dimmed: rgba(255,255,255,0.4);
+          --color-accent: #7AC9EF;
+          --color-accent-hover: #558da7;
+          --border-subtle: rgba(255,255,255,0.05);
+          --border-faint: rgba(255,255,255,0.07);
+          --border-card: rgba(201,184,122,0.15);
+          --color-card-num: rgba(201,184,122,0.15);
+          --color-btn-primary-text: #111;
+          --bg-search-overlay: rgba(0,0,0,0.85);
+          --color-mega-heading: rgba(255,255,255,0.35);
+          --color-mega-link: rgba(255,255,255,0.7);
+          --bg-mega-panel: #181818;
+          --bg-dropdown: #181818;
+          --color-brand-icon: rgba(255,255,255,0.08);
+          --color-brand-name: rgba(255,255,255,0.25);
+          --shadow-nav: 0 4px 30px rgba(0,0,0,0.4);
+        }
+
+        :root[data-theme="light"] {
+          --bg-primary: #f5f5f3;
+          --bg-secondary: #ebebea;
+          --bg-tertiary: #f0f0ee;
+          --bg-card: #fff;
+          --bg-card-hover: #f9f9f8;
+          --bg-nav: rgba(245,245,243,0.97);
+          --bg-announcement: #e8e8e6;
+          --color-text: rgba(30,30,30,0.8);
+          --color-heading: #111;
+          --color-muted: rgba(30,30,30,0.55);
+          --color-dimmed: rgba(30,30,30,0.45);
+          --color-accent: #2a8ab5;
+          --color-accent-hover: #1d6a8a;
+          --border-subtle: rgba(0,0,0,0.07);
+          --border-faint: rgba(0,0,0,0.08);
+          --border-card: rgba(100,80,20,0.15);
+          --color-card-num: rgba(100,80,20,0.12);
+          --color-btn-primary-text: #fff;
+          --bg-search-overlay: rgba(245,245,243,0.92);
+          --color-mega-heading: rgba(0,0,0,0.4);
+          --color-mega-link: rgba(0,0,0,0.7);
+          --bg-mega-panel: #fff;
+          --bg-dropdown: #fff;
+          --color-brand-icon: rgba(0,0,0,0.06);
+          --color-brand-name: rgba(0,0,0,0.2);
+          --shadow-nav: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
         .lc-header {
           font-family: 'Montserrat', sans-serif;
           position: sticky;
@@ -464,6 +524,13 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
               <button className="lc-icon-btn" onClick={() => open('mobile')} aria-label="Menu">
                 <FontAwesomeIcon icon={faBars} />
               </button>
+              <button
+                className="lc-icon-btn lc-theme-btn"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? '☀' : '☾'}
+              </button>
             </div>
 
             {/* Centered logo */}
@@ -511,6 +578,14 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
                 {cart?.totalQuantity > 0 && (
                   <span className="lc-cart-badge">{cart?.totalQuantity}</span>
                 )}
+              </button>
+
+              <button
+                className="lc-icon-btn lc-theme-btn"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? '☀' : '☾'}
               </button>
 
               {/* Mobile: only cart + search */}

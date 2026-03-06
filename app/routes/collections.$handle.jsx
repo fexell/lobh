@@ -9,6 +9,7 @@ import {
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {useState, useRef, useEffect} from 'react';
+import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = ({data}) => [
@@ -61,34 +62,111 @@ function loadDeferredData() {
 
 export default function Collection() {
   const {collection, sortKey, reverse} = useLoaderData();
+  const {theme} = useTheme();
   const hasImage = !!collection.image;
 
   return (
     <>
       <style>{`
-        :root {
-          --accent: #7AC9EF;
-          --accent-dim: rgba(122, 201, 239, 0.15);
-          --accent-border: rgba(122, 201, 239, 0.35);
+        /* ── Theme variables ── */
+        .col-page[data-theme="dark"] {
+          --col-bg:               #111;
+          --col-bg-alt:           #141414;
+          --col-bg-card:          #1a1a1a;
+          --col-bg-card-hover:    #1e1e1e;
+          --col-bg-card-img:      #141414;
+          --col-bg-card-noimg:    #181818;
+          --col-heading:          #fff;
+          --col-text:             rgba(255,255,255,0.7);
+          --col-muted:            rgba(255,255,255,0.45);
+          --col-dimmed:           rgba(255,255,255,0.5);
+          --col-border:           rgba(255,255,255,0.06);
+          --col-border-subtle:    rgba(255,255,255,0.1);
+          --col-border-card:      rgba(255,255,255,0.04);
+          --col-accent:           #7AC9EF;
+          --col-accent-dim:       rgba(122,201,239,0.15);
+          --col-accent-border:    rgba(122,201,239,0.35);
+          --col-noimg-icon:       rgba(122,201,239,0.1);
+          --col-breadcrumb:       rgba(255,255,255,0.3);
+          --col-breadcrumb-sep:   rgba(255,255,255,0.15);
+          --col-breadcrumb-cur:   rgba(255,255,255,0.55);
+          --col-sort-bg:          rgba(255,255,255,0.03);
+          --col-sort-bg-hover:    rgba(122,201,239,0.04);
+          --col-sort-bg-open:     rgba(122,201,239,0.05);
+          --col-sort-color:       rgba(255,255,255,0.55);
+          --col-sort-color-hover: rgba(255,255,255,0.85);
+          --col-sort-border:      rgba(255,255,255,0.10);
+          --col-sort-label:       rgba(255,255,255,0.25);
+          --col-menu-bg:          #1a1a1a;
+          --col-menu-border:      rgba(255,255,255,0.08);
+          --col-menu-shadow:      rgba(0,0,0,0.5);
+          --col-opt-color:        rgba(255,255,255,0.45);
+          --col-opt-color-hover:  rgba(255,255,255,0.8);
+          --col-opt-bg-hover:     rgba(255,255,255,0.04);
+          --col-opt-bg-active:    rgba(122,201,239,0.06);
+          --col-page-color:       rgba(255,255,255,0.5);
+          --col-page-border:      rgba(255,255,255,0.1);
+          --col-empty-icon:       rgba(255,255,255,0.05);
+          --col-empty-title:      rgba(255,255,255,0.3);
+          --col-empty-sub:        rgba(255,255,255,0.18);
         }
 
+        .col-page[data-theme="light"] {
+          --col-bg:               #f5f5f3;
+          --col-bg-alt:           #ebebea;
+          --col-bg-card:          #fff;
+          --col-bg-card-hover:    #f9f9f8;
+          --col-bg-card-img:      #e8e8e6;
+          --col-bg-card-noimg:    #f0f0ee;
+          --col-heading:          #111;
+          --col-text:             rgba(30,30,30,0.75);
+          --col-muted:            rgba(30,30,30,0.5);
+          --col-dimmed:           rgba(30,30,30,0.55);
+          --col-border:           rgba(0,0,0,0.07);
+          --col-border-subtle:    rgba(0,0,0,0.1);
+          --col-border-card:      rgba(0,0,0,0.05);
+          --col-accent:           #2a8ab5;
+          --col-accent-dim:       rgba(42,138,181,0.1);
+          --col-accent-border:    rgba(42,138,181,0.4);
+          --col-noimg-icon:       rgba(42,138,181,0.12);
+          --col-breadcrumb:       rgba(30,30,30,0.35);
+          --col-breadcrumb-sep:   rgba(30,30,30,0.2);
+          --col-breadcrumb-cur:   rgba(30,30,30,0.6);
+          --col-sort-bg:          rgba(0,0,0,0.02);
+          --col-sort-bg-hover:    rgba(42,138,181,0.05);
+          --col-sort-bg-open:     rgba(42,138,181,0.07);
+          --col-sort-color:       rgba(30,30,30,0.55);
+          --col-sort-color-hover: rgba(30,30,30,0.9);
+          --col-sort-border:      rgba(0,0,0,0.12);
+          --col-sort-label:       rgba(30,30,30,0.3);
+          --col-menu-bg:          #fff;
+          --col-menu-border:      rgba(0,0,0,0.1);
+          --col-menu-shadow:      rgba(0,0,0,0.12);
+          --col-opt-color:        rgba(30,30,30,0.5);
+          --col-opt-color-hover:  rgba(30,30,30,0.9);
+          --col-opt-bg-hover:     rgba(0,0,0,0.03);
+          --col-opt-bg-active:    rgba(42,138,181,0.07);
+          --col-page-color:       rgba(30,30,30,0.5);
+          --col-page-border:      rgba(0,0,0,0.12);
+          --col-empty-icon:       rgba(0,0,0,0.05);
+          --col-empty-title:      rgba(30,30,30,0.3);
+          --col-empty-sub:        rgba(30,30,30,0.2);
+        }
+
+        /* ── Base ── */
         .col-page {
-          background: #111;
+          background: var(--col-bg);
           min-height: 100vh;
           font-family: 'Montserrat', sans-serif;
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .col-hero-img,
-        .col-hero-overlay {
-          overflow: hidden;
-          border-radius: inherit;
-        }
-
-        /* ── Hero banner ── */
+        /* ── Hero banner — always dark (photo background) ── */
         .col-hero {
           position: relative;
           width: 100%;
           height: 340px;
+          /* overflow: hidden; */
         }
 
         .col-hero-img {
@@ -128,10 +206,20 @@ export default function Collection() {
           left: 0; right: 0;
         }
 
-        /* ── Plain header (no image) ── */
+        /* Hero text always white — dark photo underneath */
+        .col-hero .col-label         { color: #7AC9EF; }
+        .col-hero .col-label::before { background: #7AC9EF; }
+        .col-hero .col-title         { color: #fff; }
+        .col-hero .col-description   { color: rgba(255,255,255,0.45); }
+        .col-hero .col-breadcrumb a  { color: rgba(255,255,255,0.3); }
+        .col-hero .col-breadcrumb a:hover { color: #7AC9EF; }
+        .col-hero .col-breadcrumb-sep    { color: rgba(255,255,255,0.15); }
+        .col-hero .col-breadcrumb-current { color: rgba(255,255,255,0.55); }
+
+        /* ── Plain header (no image) — theme-aware ── */
         .col-header {
-          background: #141414;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--col-bg-alt);
+          border-bottom: 1px solid var(--col-border);
           padding: 64px 48px 48px;
         }
 
@@ -145,15 +233,13 @@ export default function Collection() {
           flex-wrap: wrap;
         }
 
-        .col-header-text {}
-
         /* ── Shared header elements ── */
         .col-label {
           font-size: 9px;
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: var(--accent);
+          color: var(--col-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -165,14 +251,14 @@ export default function Collection() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: var(--accent);
+          background: var(--col-accent);
         }
 
         .col-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(36px, 5vw, 64px);
           font-weight: 300;
-          color: #fff;
+          color: var(--col-heading);
           margin: 0 0 14px;
           letter-spacing: -0.01em;
           line-height: 1.1;
@@ -182,7 +268,7 @@ export default function Collection() {
           font-size: 13px;
           font-weight: 300;
           line-height: 1.75;
-          color: rgba(255,255,255,0.45);
+          color: var(--col-muted);
           max-width: 560px;
           margin: 0;
         }
@@ -200,16 +286,16 @@ export default function Collection() {
           font-weight: 400;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.3);
+          color: var(--col-breadcrumb);
           text-decoration: none;
           transition: color 0.15s;
         }
 
-        .col-breadcrumb a:hover { color: var(--accent); }
+        .col-breadcrumb a:hover { color: var(--col-accent); }
 
         .col-breadcrumb-sep {
           font-size: 10px;
-          color: rgba(255,255,255,0.15);
+          color: var(--col-breadcrumb-sep);
         }
 
         .col-breadcrumb-current {
@@ -217,10 +303,10 @@ export default function Collection() {
           font-weight: 500;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.55);
+          color: var(--col-breadcrumb-cur);
         }
 
-        /* Hero sort — floated to bottom-right */
+        /* Hero sort footer */
         .col-hero-footer {
           display: flex;
           align-items: flex-end;
@@ -228,8 +314,6 @@ export default function Collection() {
           gap: 24px;
           flex-wrap: wrap;
         }
-
-        .col-hero-text {}
 
         /* ── Grid body ── */
         .col-body {
@@ -267,7 +351,7 @@ export default function Collection() {
         .pcard {
           display: block;
           text-decoration: none;
-          background: #1a1a1a;
+          background: var(--col-bg-card);
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
@@ -278,21 +362,21 @@ export default function Collection() {
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: var(--accent);
+          background: var(--col-accent);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           z-index: 1;
         }
 
-        .pcard:hover { background: #1e1e1e; }
+        .pcard:hover { background: var(--col-bg-card-hover); }
         .pcard:hover::before { transform: scaleX(1); }
 
         .pcard-img-wrap {
           position: relative;
           overflow: hidden;
           aspect-ratio: 1 / 1;
-          background: #141414;
+          background: var(--col-bg-card-img);
         }
 
         .pcard-img-wrap img {
@@ -310,7 +394,7 @@ export default function Collection() {
         .pcard-no-img {
           width: 100%;
           aspect-ratio: 1 / 1;
-          background: #181818;
+          background: var(--col-bg-card-noimg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -319,20 +403,20 @@ export default function Collection() {
         .pcard-no-img-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 48px;
-          color: rgba(122,201,239,0.1);
+          color: var(--col-noimg-icon);
           font-weight: 300;
         }
 
         .pcard-body {
           padding: 18px 20px 22px;
-          border-top: 1px solid rgba(255,255,255,0.04);
+          border-top: 1px solid var(--col-border-card);
         }
 
         .pcard-title {
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0.04em;
-          color: rgba(255,255,255,0.7);
+          color: var(--col-text);
           margin-bottom: 8px;
           line-height: 1.4;
           white-space: nowrap;
@@ -341,13 +425,13 @@ export default function Collection() {
           transition: color 0.2s;
         }
 
-        .pcard:hover .pcard-title { color: #fff; }
+        .pcard:hover .pcard-title { color: var(--col-heading); }
 
         .pcard-price {
           font-family: 'Cormorant Garamond', serif;
           font-size: 18px;
           font-weight: 300;
-          color: var(--accent);
+          color: var(--col-accent);
           letter-spacing: 0.02em;
         }
 
@@ -367,10 +451,10 @@ export default function Collection() {
           font-weight: 600;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.55);
-          border: 1px solid rgba(255,255,255,0.10);
+          color: var(--col-sort-color);
+          border: 1px solid var(--col-sort-border);
           border-radius: 3px;
-          background: rgba(255,255,255,0.03);
+          background: var(--col-sort-bg);
           cursor: pointer;
           transition: color 0.2s, border-color 0.2s, background 0.2s;
           white-space: nowrap;
@@ -378,38 +462,42 @@ export default function Collection() {
         }
 
         .sort-trigger:hover {
-          color: rgba(255,255,255,0.85);
-          border-color: var(--accent-border);
-          background: var(--accent-dim);
+          color: var(--col-sort-color-hover);
+          border-color: var(--col-accent-border);
+          background: var(--col-sort-bg-hover);
         }
 
         .sort-trigger.open {
-          color: var(--accent);
-          border-color: var(--accent-border);
-          background: rgba(122,201,239,0.05);
+          color: var(--col-accent);
+          border-color: var(--col-accent-border);
+          background: var(--col-sort-bg-open);
         }
 
-        /* On hero, slightly more opaque backdrop so it reads over the image */
+        /* Hero variant — always dark-style over the photo */
         .sort-trigger--hero {
-          background: rgba(0,0,0,0.35);
-          border-color: rgba(255,255,255,0.15);
+          background: rgba(0,0,0,0.35) !important;
+          border-color: rgba(255,255,255,0.15) !important;
+          color: rgba(255,255,255,0.7) !important;
           backdrop-filter: blur(6px);
         }
 
         .sort-trigger--hero:hover,
         .sort-trigger--hero.open {
-          background: rgba(122,201,239,0.12);
-          border-color: var(--accent-border);
+          background: rgba(122,201,239,0.12) !important;
+          border-color: rgba(122,201,239,0.45) !important;
+          color: #7AC9EF !important;
         }
 
         .sort-trigger-label {
-          color: rgba(255,255,255,0.25);
+          color: var(--col-sort-label);
           margin-right: 2px;
         }
 
-        .sort-trigger-value {
-          color: inherit;
+        .sort-trigger--hero .sort-trigger-label {
+          color: rgba(255,255,255,0.35);
         }
+
+        .sort-trigger-value { color: inherit; }
 
         .sort-chevron {
           width: 10px;
@@ -429,12 +517,12 @@ export default function Collection() {
           top: calc(100% + 8px);
           right: 0;
           min-width: 200px;
-          background: #1a1a1a;
-          border: 1px solid rgba(255,255,255,0.08);
+          background: var(--col-menu-bg);
+          border: 1px solid var(--col-menu-border);
           border-radius: 4px;
           overflow: hidden;
           z-index: 100;
-          box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+          box-shadow: 0 16px 40px var(--col-menu-shadow);
           opacity: 0;
           transform: translateY(-6px);
           pointer-events: none;
@@ -456,7 +544,7 @@ export default function Collection() {
           font-weight: 500;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.45);
+          color: var(--col-opt-color);
           cursor: pointer;
           transition: background 0.15s, color 0.15s;
           border: none;
@@ -467,13 +555,13 @@ export default function Collection() {
         }
 
         .sort-option:hover {
-          background: rgba(255,255,255,0.04);
-          color: rgba(255,255,255,0.8);
+          background: var(--col-opt-bg-hover);
+          color: var(--col-opt-color-hover);
         }
 
         .sort-option.active {
-          color: var(--accent);
-          background: rgba(122,201,239,0.06);
+          color: var(--col-accent);
+          background: var(--col-opt-bg-active);
         }
 
         .sort-option-check {
@@ -485,35 +573,6 @@ export default function Collection() {
 
         .sort-option.active .sort-option-check {
           opacity: 1;
-        }
-
-        /* ── Empty state ── */
-        .col-empty {
-          text-align: center;
-          padding: 120px 24px;
-        }
-
-        .col-empty-icon {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 80px;
-          color: rgba(255,255,255,0.05);
-          line-height: 1;
-          margin-bottom: 24px;
-        }
-
-        .col-empty-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 28px;
-          font-weight: 300;
-          color: rgba(255,255,255,0.3);
-          margin-bottom: 8px;
-        }
-
-        .col-empty-sub {
-          font-size: 11px;
-          color: rgba(255,255,255,0.18);
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
         }
 
         /* ── Pagination ── */
@@ -536,8 +595,8 @@ export default function Collection() {
           letter-spacing: 0.18em;
           text-transform: uppercase;
           text-decoration: none;
-          color: rgba(255,255,255,0.5);
-          border: 1px solid rgba(255,255,255,0.1);
+          color: var(--col-page-color);
+          border: 1px solid var(--col-page-border);
           border-radius: 3px;
           background: transparent;
           cursor: pointer;
@@ -546,13 +605,42 @@ export default function Collection() {
 
         .col-pagination a:hover,
         .col-pagination button:hover {
-          color: #fff;
-          border-color: var(--accent-border);
-          background: var(--accent-dim);
+          color: var(--col-heading);
+          border-color: var(--col-accent-border);
+          background: var(--col-accent-dim);
+        }
+
+        /* ── Empty state ── */
+        .col-empty {
+          text-align: center;
+          padding: 120px 24px;
+        }
+
+        .col-empty-icon {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 80px;
+          color: var(--col-empty-icon);
+          line-height: 1;
+          margin-bottom: 24px;
+        }
+
+        .col-empty-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 28px;
+          font-weight: 300;
+          color: var(--col-empty-title);
+          margin-bottom: 8px;
+        }
+
+        .col-empty-sub {
+          font-size: 11px;
+          color: var(--col-empty-sub);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }
       `}</style>
 
-      <div className="col-page">
+      <div className="col-page" data-theme={theme}>
 
         {/* Hero (with image) or plain header */}
         {hasImage ? (
@@ -700,7 +788,7 @@ function SortDropdown({currentSortKey, currentReverse, heroVariant = false}) {
             >
               {option.label}
               <svg className="sort-option-check" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 7L5.5 10L11.5 4" stroke="#7AC9EF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           );

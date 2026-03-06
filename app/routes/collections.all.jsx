@@ -4,6 +4,7 @@ import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {useState, useRef, useEffect} from 'react';
+import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
 export const meta = () => [{title: 'Katalog | Alla produkter'}];
@@ -46,20 +47,104 @@ function loadDeferredData() {
 
 export default function Collection() {
   const {products, sortKey, reverse} = useLoaderData();
+  const {theme} = useTheme();
 
   return (
     <>
       <style>{`
+        /* ── Theme variables ── */
+        .cat-page[data-theme="dark"] {
+          --cat-bg:               #111;
+          --cat-bg-alt:           #141414;
+          --cat-bg-card:          #1a1a1a;
+          --cat-bg-card-hover:    #1e1e1e;
+          --cat-bg-card-img:      #141414;
+          --cat-bg-card-noimg:    #181818;
+          --cat-heading:          #fff;
+          --cat-text:             rgba(255,255,255,0.75);
+          --cat-muted:            rgba(255,255,255,0.25);
+          --cat-dimmed:           rgba(255,255,255,0.45);
+          --cat-border:           rgba(255,255,255,0.06);
+          --cat-border-subtle:    rgba(255,255,255,0.08);
+          --cat-border-faint:     rgba(255,255,255,0.05);
+          --cat-accent:           #7AC9EF;
+          --cat-accent-rgb:       122,201,239;
+          --cat-noimg-icon:       rgba(201,184,122,0.12);
+          --cat-sort-bg:          rgba(255,255,255,0.03);
+          --cat-sort-bg-hover:    rgba(122,201,239,0.04);
+          --cat-sort-bg-open:     rgba(122,201,239,0.05);
+          --cat-sort-color:       rgba(255,255,255,0.55);
+          --cat-sort-color-hover: rgba(255,255,255,0.85);
+          --cat-sort-border:      rgba(255,255,255,0.10);
+          --cat-sort-border-hover:rgba(122,201,239,0.35);
+          --cat-sort-border-open: rgba(122,201,239,0.5);
+          --cat-sort-label:       rgba(255,255,255,0.25);
+          --cat-menu-bg:          #1a1a1a;
+          --cat-menu-border:      rgba(255,255,255,0.08);
+          --cat-opt-color:        rgba(255,255,255,0.45);
+          --cat-opt-color-hover:  rgba(255,255,255,0.8);
+          --cat-opt-bg-hover:     rgba(255,255,255,0.04);
+          --cat-opt-bg-active:    rgba(122,201,239,0.06);
+          --cat-divider:          rgba(255,255,255,0.05);
+          --cat-page-border:      rgba(201,184,122,0.5);
+          --cat-page-bg-hover:    rgba(201,184,122,0.05);
+          --cat-empty-icon:       rgba(255,255,255,0.06);
+          --cat-empty-title:      rgba(255,255,255,0.4);
+          --cat-empty-sub:        rgba(255,255,255,0.2);
+        }
+
+        .cat-page[data-theme="light"] {
+          --cat-bg:               #f5f5f3;
+          --cat-bg-alt:           #ebebea;
+          --cat-bg-card:          #fff;
+          --cat-bg-card-hover:    #f9f9f8;
+          --cat-bg-card-img:      #e8e8e6;
+          --cat-bg-card-noimg:    #f0f0ee;
+          --cat-heading:          #111;
+          --cat-text:             rgba(30,30,30,0.8);
+          --cat-muted:            rgba(30,30,30,0.35);
+          --cat-dimmed:           rgba(30,30,30,0.55);
+          --cat-border:           rgba(0,0,0,0.07);
+          --cat-border-subtle:    rgba(0,0,0,0.08);
+          --cat-border-faint:     rgba(0,0,0,0.05);
+          --cat-accent:           #2a8ab5;
+          --cat-accent-rgb:       42,138,181;
+          --cat-noimg-icon:       rgba(100,80,20,0.1);
+          --cat-sort-bg:          rgba(0,0,0,0.02);
+          --cat-sort-bg-hover:    rgba(42,138,181,0.05);
+          --cat-sort-bg-open:     rgba(42,138,181,0.07);
+          --cat-sort-color:       rgba(30,30,30,0.55);
+          --cat-sort-color-hover: rgba(30,30,30,0.9);
+          --cat-sort-border:      rgba(0,0,0,0.12);
+          --cat-sort-border-hover:rgba(42,138,181,0.4);
+          --cat-sort-border-open: rgba(42,138,181,0.6);
+          --cat-sort-label:       rgba(30,30,30,0.3);
+          --cat-menu-bg:          #fff;
+          --cat-menu-border:      rgba(0,0,0,0.1);
+          --cat-opt-color:        rgba(30,30,30,0.5);
+          --cat-opt-color-hover:  rgba(30,30,30,0.9);
+          --cat-opt-bg-hover:     rgba(0,0,0,0.03);
+          --cat-opt-bg-active:    rgba(42,138,181,0.07);
+          --cat-divider:          rgba(0,0,0,0.06);
+          --cat-page-border:      rgba(42,138,181,0.5);
+          --cat-page-bg-hover:    rgba(42,138,181,0.05);
+          --cat-empty-icon:       rgba(0,0,0,0.06);
+          --cat-empty-title:      rgba(30,30,30,0.35);
+          --cat-empty-sub:        rgba(30,30,30,0.2);
+        }
+
+        /* ── Base ── */
         .cat-page {
-          background: #111;
+          background: var(--cat-bg);
           min-height: 100vh;
           font-family: 'Montserrat', sans-serif;
+          transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ── Page header ── */
         .cat-header {
-          background: #141414;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--cat-bg-alt);
+          border-bottom: 1px solid var(--cat-border);
           padding: 64px 48px 48px;
         }
 
@@ -77,14 +162,12 @@ export default function Collection() {
           flex-wrap: wrap;
         }
 
-        .cat-header-text {}
-
         .cat-label {
           font-size: 9px;
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--cat-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -96,14 +179,14 @@ export default function Collection() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--cat-accent);
         }
 
         .cat-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(36px, 5vw, 60px);
           font-weight: 300;
-          color: #fff;
+          color: var(--cat-heading);
           margin: 0 0 12px;
           letter-spacing: -0.01em;
           line-height: 1.1;
@@ -112,7 +195,7 @@ export default function Collection() {
         .cat-count {
           font-size: 11px;
           font-weight: 300;
-          color: rgba(255,255,255,0.25);
+          color: var(--cat-muted);
           letter-spacing: 0.08em;
         }
 
@@ -132,10 +215,10 @@ export default function Collection() {
           font-weight: 600;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.55);
-          border: 1px solid rgba(255,255,255,0.10);
+          color: var(--cat-sort-color);
+          border: 1px solid var(--cat-sort-border);
           border-radius: 3px;
-          background: rgba(255,255,255,0.03);
+          background: var(--cat-sort-bg);
           cursor: pointer;
           transition: color 0.2s, border-color 0.2s, background 0.2s;
           white-space: nowrap;
@@ -143,19 +226,19 @@ export default function Collection() {
         }
 
         .sort-trigger:hover {
-          color: rgba(255,255,255,0.85);
-          border-color: rgba(122,201,239,0.35);
-          background: rgba(122,201,239,0.04);
+          color: var(--cat-sort-color-hover);
+          border-color: var(--cat-sort-border-hover);
+          background: var(--cat-sort-bg-hover);
         }
 
         .sort-trigger.open {
-          color: #7AC9EF;
-          border-color: rgba(122,201,239,0.5);
-          background: rgba(122,201,239,0.05);
+          color: var(--cat-accent);
+          border-color: var(--cat-sort-border-open);
+          background: var(--cat-sort-bg-open);
         }
 
         .sort-trigger-label {
-          color: rgba(255,255,255,0.25);
+          color: var(--cat-sort-label);
           margin-right: 2px;
         }
 
@@ -181,12 +264,12 @@ export default function Collection() {
           top: calc(100% + 8px);
           right: 0;
           min-width: 200px;
-          background: #1a1a1a;
-          border: 1px solid rgba(255,255,255,0.08);
+          background: var(--cat-menu-bg);
+          border: 1px solid var(--cat-menu-border);
           border-radius: 4px;
           overflow: hidden;
           z-index: 100;
-          box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.15);
           opacity: 0;
           transform: translateY(-6px);
           pointer-events: none;
@@ -208,7 +291,7 @@ export default function Collection() {
           font-weight: 500;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.45);
+          color: var(--cat-opt-color);
           cursor: pointer;
           transition: background 0.15s, color 0.15s;
           border: none;
@@ -219,13 +302,13 @@ export default function Collection() {
         }
 
         .sort-option:hover {
-          background: rgba(255,255,255,0.04);
-          color: rgba(255,255,255,0.8);
+          background: var(--cat-opt-bg-hover);
+          color: var(--cat-opt-color-hover);
         }
 
         .sort-option.active {
-          color: #7AC9EF;
-          background: rgba(122,201,239,0.06);
+          color: var(--cat-accent);
+          background: var(--cat-opt-bg-active);
         }
 
         .sort-option-check {
@@ -241,7 +324,7 @@ export default function Collection() {
 
         .sort-divider {
           height: 1px;
-          background: rgba(255,255,255,0.05);
+          background: var(--cat-divider);
           margin: 4px 0;
         }
 
@@ -256,7 +339,6 @@ export default function Collection() {
           .cat-body { padding: 40px 24px 80px; }
         }
 
-        /* Override Hydrogen's resourcesClassName */
         .products-grid {
           display: grid !important;
           grid-template-columns: repeat(4, 1fr) !important;
@@ -279,14 +361,14 @@ export default function Collection() {
         .pcard {
           display: block;
           text-decoration: none;
-          background: #1a1a1a;
+          background: var(--cat-bg-card);
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
         }
 
         .pcard:hover {
-          background: #1e1e1e;
+          background: var(--cat-bg-card-hover);
         }
 
         .pcard::before {
@@ -294,7 +376,7 @@ export default function Collection() {
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: #7AC9EF;
+          background: var(--cat-accent);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -309,7 +391,7 @@ export default function Collection() {
           position: relative;
           overflow: hidden;
           aspect-ratio: 1 / 1;
-          background: #141414;
+          background: var(--cat-bg-card-img);
         }
 
         .pcard-img-wrap img {
@@ -327,7 +409,7 @@ export default function Collection() {
         .pcard-no-img {
           width: 100%;
           aspect-ratio: 1 / 1;
-          background: #181818;
+          background: var(--cat-bg-card-noimg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -336,7 +418,7 @@ export default function Collection() {
         .pcard-no-img-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 48px;
-          color: rgba(201,184,122,0.12);
+          color: var(--cat-noimg-icon);
           font-weight: 300;
         }
 
@@ -348,7 +430,7 @@ export default function Collection() {
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0.05em;
-          color: rgba(255,255,255,0.75);
+          color: var(--cat-text);
           margin-bottom: 8px;
           line-height: 1.4;
           white-space: nowrap;
@@ -358,14 +440,14 @@ export default function Collection() {
         }
 
         .pcard:hover .pcard-title {
-          color: #fff;
+          color: var(--cat-heading);
         }
 
         .pcard-price {
           font-family: 'Cormorant Garamond', serif;
           font-size: 18px;
           font-weight: 300;
-          color: #7AC9EF;
+          color: var(--cat-accent);
           letter-spacing: 0.02em;
         }
 
@@ -389,8 +471,8 @@ export default function Collection() {
           letter-spacing: 0.18em;
           text-transform: uppercase;
           text-decoration: none;
-          color: rgba(255,255,255,0.6);
-          border: 1px solid rgba(255,255,255,0.12);
+          color: var(--cat-dimmed);
+          border: 1px solid var(--cat-border-subtle);
           border-radius: 3px;
           background: transparent;
           cursor: pointer;
@@ -399,9 +481,9 @@ export default function Collection() {
 
         .cat-pagination a:hover,
         .cat-pagination button:hover {
-          color: #fff;
-          border-color: rgba(201,184,122,0.5);
-          background: rgba(201,184,122,0.05);
+          color: var(--cat-heading);
+          border-color: var(--cat-page-border);
+          background: var(--cat-page-bg-hover);
         }
 
         /* ── Empty state ── */
@@ -413,7 +495,7 @@ export default function Collection() {
         .cat-empty-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 80px;
-          color: rgba(255,255,255,0.06);
+          color: var(--cat-empty-icon);
           line-height: 1;
           margin-bottom: 24px;
         }
@@ -422,18 +504,18 @@ export default function Collection() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 28px;
           font-weight: 300;
-          color: rgba(255,255,255,0.4);
+          color: var(--cat-empty-title);
           margin-bottom: 12px;
         }
 
         .cat-empty-sub {
           font-size: 12px;
-          color: rgba(255,255,255,0.2);
+          color: var(--cat-empty-sub);
           letter-spacing: 0.05em;
         }
       `}</style>
 
-      <div className="cat-page">
+      <div className="cat-page" data-theme={theme}>
         {/* Page header */}
         <div className="cat-header">
           <div className="cat-header-inner">
@@ -478,7 +560,6 @@ function SortDropdown({currentSortKey, currentReverse}) {
       (o) => o.key === currentSortKey && o.reverse === currentReverse,
     ) || SORT_OPTIONS[0];
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e) {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
@@ -491,7 +572,6 @@ function SortDropdown({currentSortKey, currentReverse}) {
     const params = new URLSearchParams(location.search);
     params.set('sort', option.key);
     params.set('reverse', String(option.reverse));
-    // Reset pagination when sorting changes
     params.delete('cursor');
     params.delete('direction');
     navigate(`${location.pathname}?${params.toString()}`, {replace: true});
@@ -514,7 +594,7 @@ function SortDropdown({currentSortKey, currentReverse}) {
       </button>
 
       <div className={`sort-menu${open ? ' open' : ''}`} role="listbox">
-        {SORT_OPTIONS.map((option, i) => {
+        {SORT_OPTIONS.map((option) => {
           const isActive =
             option.key === currentSortKey && option.reverse === currentReverse;
           return (
@@ -527,7 +607,7 @@ function SortDropdown({currentSortKey, currentReverse}) {
             >
               {option.label}
               <svg className="sort-option-check" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 7L5.5 10L11.5 4" stroke="#7AC9EF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           );
