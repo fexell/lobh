@@ -4,6 +4,8 @@ import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {useTheme} from '~/components/PageLayout';
 
+export const meta = () => [{title: 'Ljud & Bild Hörnan | Kollektioner'}];
+
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
   const deferredData = loadDeferredData(args);
