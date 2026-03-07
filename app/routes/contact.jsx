@@ -9,7 +9,9 @@ import { useLoaderData } from "@remix-run/react";
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
 export async function loader() {
-  return json({ turnstileSiteKey: process.env.TURNSTILE_SITE_KEY });
+  const key = process.env.TURNSTILE_SITE_KEY;
+  if (!key) console.error("TURNSTILE_SITE_KEY is not set!");
+  return json({ turnstileSiteKey: key });
 }
 
 export async function action({ request, context }) {
@@ -28,7 +30,7 @@ export async function action({ request, context }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        secret: process.env.TURNSTILE_SITE_KEY,
+        secret: process.env.TURNSTILE_SECRET_KEY,
         response: token,
       }),
     }
