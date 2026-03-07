@@ -5,8 +5,10 @@ import {Aside, useAside} from '~/components/Aside';
 import {SearchInput} from './SearchInput';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCartShopping, faBars, faMagnifyingGlass, faUser} from '@fortawesome/free-solid-svg-icons';
-import Logo from '../assets/Logo - Squares Only.svg';
 import { useTheme } from './PageLayout';
+
+import Logo from '../assets/Logo - Squares Only.svg';
+import TextLogo from '../assets/Logo - Text Only White.svg';
 
 /**
  * @param {HeaderProps}
@@ -748,8 +750,10 @@ function DropdownMenu({ item, close, shopName }) {
 
             {/* Branding panel */}
             <div className="lc-mega-brand">
-              <div className="lc-mega-brand-icon">K</div>
-              <div className="lc-mega-brand-name">{shopName || 'Katalog'}</div>
+              <div className="lc-mega-brand-icon">
+                <img className='hover:opacity-100! transition-opacity duration-75' src={TextLogo} alt="" style={{ height: '80px', opacity: '0.4' }} />
+              </div>
+              {/* <div className="lc-mega-brand-name">{shopName || 'Katalog'}</div> */}
             </div>
           </div>
         </div>
