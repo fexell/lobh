@@ -662,6 +662,8 @@ export default function ContactPage() {
                 }}
               />
 
+              { turnstileSiteKey }
+
               <div className="cp-footer">
                 <button type="submit" className="cp-btn">
                   Skicka meddelande →
