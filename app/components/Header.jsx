@@ -646,10 +646,15 @@ function HeaderNavItems({ items, primaryDomainUrl, publicStoreDomain, close, sho
         const url = normalizeUrl(item.url);
 
         if (item.items?.length > 0) {
+          // AFTER
           const normalizedItem = {
             ...item,
             url,
-            items: item.items.map((sub) => ({ ...sub, url: normalizeUrl(sub.url) })),
+            items: item.items.map((sub) => ({
+              ...sub,
+              url: normalizeUrl(sub.url),
+              items: sub.items?.map((grand) => ({ ...grand, url: normalizeUrl(grand.url) })) ?? [],
+            })),
           };
           return <DropdownMenu key={item.id} item={normalizedItem} close={close} shopName={shopName} />;
         }
