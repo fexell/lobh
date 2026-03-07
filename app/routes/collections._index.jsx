@@ -2,6 +2,7 @@ import {useLoaderData, Link} from '@remix-run/react';
 import {defer} from '@netlify/remix-runtime';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {useTheme} from '~/components/PageLayout';
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
@@ -26,20 +27,60 @@ function loadDeferredData() {
 
 export default function Collections() {
   const {collections} = useLoaderData();
+  const {theme} = useTheme();
 
   return (
     <>
       <style>{`
+        /* ── Theme variables ── */
+        .ci-page[data-theme="dark"] {
+          --ci-bg:              #111;
+          --ci-bg-header:       #141414;
+          --ci-bg-card:         #1a1a1a;
+          --ci-heading:         #fff;
+          --ci-subtitle:        rgba(255,255,255,0.25);
+          --ci-border:          rgba(255,255,255,0.06);
+          --ci-accent:          #7AC9EF;
+          --ci-noimg-icon:      rgba(122,201,239,0.08);
+          --ci-noimg-grad:      linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+          --ci-overlay:         linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.05) 100%);
+          --ci-overlay-hover:   linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.2) 100%);
+          --ci-card-title:      #fff;
+          --ci-card-arrow:      rgba(255,255,255,0.4);
+          --ci-empty-icon:      rgba(255,255,255,0.05);
+          --ci-empty-title:     rgba(255,255,255,0.3);
+        }
+
+        .ci-page[data-theme="light"] {
+          --ci-bg:              #f5f5f3;
+          --ci-bg-header:       #ebebea;
+          --ci-bg-card:         #e0e0de;
+          --ci-heading:         #111;
+          --ci-subtitle:        rgba(30,30,30,0.35);
+          --ci-border:          rgba(0,0,0,0.07);
+          --ci-accent:          #2a8ab5;
+          --ci-noimg-icon:      rgba(42,138,181,0.1);
+          --ci-noimg-grad:      linear-gradient(135deg, #e8e8e6 0%, #deded c 100%);
+          --ci-overlay:         linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.02) 100%);
+          --ci-overlay-hover:   linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.15) 100%);
+          --ci-card-title:      #fff;
+          --ci-card-arrow:      rgba(255,255,255,0.55);
+          --ci-empty-icon:      rgba(0,0,0,0.05);
+          --ci-empty-title:     rgba(30,30,30,0.3);
+        }
+
+        /* ── Base ── */
         .ci-page {
-          background: #111;
+          background: var(--ci-bg);
           min-height: 100vh;
           font-family: 'Montserrat', sans-serif;
+          transition: background 0.3s ease;
         }
 
         /* ── Page header ── */
         .ci-header {
-          background: #141414;
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: var(--ci-bg-header);
+          border-bottom: 1px solid var(--ci-border);
           padding: 64px 48px 48px;
         }
 
@@ -57,7 +98,7 @@ export default function Collections() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--ci-accent);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -69,14 +110,14 @@ export default function Collections() {
           display: inline-block;
           width: 24px;
           height: 1px;
-          background: #7AC9EF;
+          background: var(--ci-accent);
         }
 
         .ci-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(36px, 5vw, 60px);
           font-weight: 300;
-          color: #fff;
+          color: var(--ci-heading);
           margin: 0 0 10px;
           letter-spacing: -0.01em;
           line-height: 1.1;
@@ -85,7 +126,7 @@ export default function Collections() {
         .ci-subtitle {
           font-size: 12px;
           font-weight: 300;
-          color: rgba(255,255,255,0.25);
+          color: var(--ci-subtitle);
           letter-spacing: 0.06em;
         }
 
@@ -100,7 +141,6 @@ export default function Collections() {
           .ci-body { padding: 40px 24px 72px; }
         }
 
-        /* Override Hydrogen's resourcesClassName */
         .collections-grid {
           display: grid !important;
           grid-template-columns: repeat(3, 1fr) !important;
@@ -120,14 +160,13 @@ export default function Collections() {
         .ci-card {
           display: block;
           text-decoration: none;
-          background: #1a1a1a;
+          background: var(--ci-bg-card);
           position: relative;
           overflow: hidden;
           transition: background 0.2s;
           aspect-ratio: 4 / 3;
         }
 
-        /* Image fills the card */
         .ci-card-img {
           position: absolute;
           inset: 0;
@@ -153,7 +192,7 @@ export default function Collections() {
         .ci-card-no-img {
           position: absolute;
           inset: 0;
-          background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+          background: var(--ci-noimg-grad);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -163,40 +202,30 @@ export default function Collections() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 64px;
           font-weight: 300;
-          color: rgba(122,201,239,0.08);
+          color: var(--ci-noimg-icon);
           user-select: none;
         }
 
-        /* Gradient overlay — always present, darkens on hover */
+        /* Gradient overlay */
         .ci-card-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            to top,
-            rgba(0,0,0,0.85) 0%,
-            rgba(0,0,0,0.2) 50%,
-            rgba(0,0,0,0.05) 100%
-          );
+          background: var(--ci-overlay);
           transition: background 0.3s;
           z-index: 1;
         }
 
         .ci-card:hover .ci-card-overlay {
-          background: linear-gradient(
-            to top,
-            rgba(0,0,0,0.92) 0%,
-            rgba(0,0,0,0.5) 60%,
-            rgba(0,0,0,0.2) 100%
-          );
+          background: var(--ci-overlay-hover);
         }
 
-        /* Blue top border that sweeps in */
+        /* Blue top border sweep */
         .ci-card::before {
           content: '';
           position: absolute;
           top: 0; left: 0; right: 0;
           height: 2px;
-          background: #7AC9EF;
+          background: var(--ci-accent);
           transform: scaleX(0);
           transform-origin: left;
           transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -228,7 +257,7 @@ export default function Collections() {
           font-weight: 700;
           letter-spacing: 0.24em;
           text-transform: uppercase;
-          color: #7AC9EF;
+          color: var(--ci-accent);
           margin-bottom: 6px;
           opacity: 0;
           transform: translateY(6px);
@@ -240,11 +269,12 @@ export default function Collections() {
           transform: translateY(0);
         }
 
+        /* Card title and arrow always white — dark overlay underneath */
         .ci-card-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: clamp(20px, 2.5vw, 28px);
           font-weight: 300;
-          color: #fff;
+          color: var(--ci-card-title);
           letter-spacing: 0.01em;
           line-height: 1.2;
           margin: 0;
@@ -259,7 +289,7 @@ export default function Collections() {
           font-weight: 700;
           letter-spacing: 0.18em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.4);
+          color: var(--ci-card-arrow);
           opacity: 0;
           transform: translateX(-6px);
           transition: opacity 0.25s ease 0.08s, transform 0.25s ease 0.08s;
@@ -268,7 +298,7 @@ export default function Collections() {
         .ci-card-arrow::after {
           content: '→';
           font-size: 12px;
-          color: #7AC9EF;
+          color: var(--ci-accent);
         }
 
         .ci-card:hover .ci-card-arrow {
@@ -285,7 +315,7 @@ export default function Collections() {
         .ci-empty-icon {
           font-family: 'Cormorant Garamond', serif;
           font-size: 72px;
-          color: rgba(255,255,255,0.05);
+          color: var(--ci-empty-icon);
           line-height: 1;
           margin-bottom: 20px;
         }
@@ -294,11 +324,11 @@ export default function Collections() {
           font-family: 'Cormorant Garamond', serif;
           font-size: 26px;
           font-weight: 300;
-          color: rgba(255,255,255,0.3);
+          color: var(--ci-empty-title);
         }
       `}</style>
 
-      <div className="ci-page">
+      <div className="ci-page" data-theme={theme}>
 
         {/* Header */}
         <div className="ci-header">
@@ -339,7 +369,6 @@ function CollectionItem({collection, index}) {
       to={`/collections/${collection.handle}`}
       prefetch="intent"
     >
-      {/* Image or placeholder */}
       {collection.image ? (
         <div className="ci-card-img">
           <Image
@@ -356,10 +385,8 @@ function CollectionItem({collection, index}) {
         </div>
       )}
 
-      {/* Gradient overlay */}
       <div className="ci-card-overlay" />
 
-      {/* Text */}
       <div className="ci-card-content">
         <div className="ci-card-label">Kollektion</div>
         <h2 className="ci-card-title">{collection.title}</h2>
