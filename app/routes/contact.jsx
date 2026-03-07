@@ -3,15 +3,14 @@ import { json } from "@remix-run/server-runtime";
 import { Form, useActionData } from "@remix-run/react";
 import { Resend } from 'resend';
 import { useTheme } from '~/components/PageLayout';
-import { Turnstile } from '@marsidev/react-turnstile';
+import {Turnstile} from '@marsidev/react-turnstile';
 import { useLoaderData } from "@remix-run/react";
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
 export async function loader() {
-  const key = process.env.TURNSTILE_SITE_KEY;
-  if (!key) console.error("TURNSTILE_SITE_KEY is not set!");
-  return json({ turnstileSiteKey: key });
+  console.log('TURNSTILE_SITE_KEY:', process.env.TURNSTILE_SITE_KEY);
+  return json({ turnstileSiteKey: process.env.TURNSTILE_SITE_KEY });
 }
 
 export async function action({ request, context }) {
