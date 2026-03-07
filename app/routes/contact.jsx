@@ -8,9 +8,9 @@ import { useLoaderData } from "@remix-run/react";
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
-export async function loader() {
-  console.log('TURNSTILE_SITE_KEY:', process.env.TURNSTILE_SITE_KEY);
-  return json({ turnstileSiteKey: process.env.TURNSTILE_SITE_KEY });
+export async function loader({context}) {
+  console.log('TURNSTILE_SITE_KEY:', context.env.VITE_TURNSTILE_SITE_KEY);
+  return json({ turnstileSiteKey: context.env.VITE_TURNSTILE_SITE_KEY });
 }
 
 export async function action({ request, context }) {
@@ -29,7 +29,7 @@ export async function action({ request, context }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY,
+        secret: context.env.VITE_TURNSTILE_SECRET_KEY,
         response: token,
       }),
     }
@@ -655,14 +655,9 @@ export default function ContactPage() {
               </div>
 
               <Turnstile
-                className='hidden!'
-                siteKey={turnstileSiteKey}
-                options={{
-                  theme: theme === 'dark' ? 'dark' : 'light',
-                }}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                onSuccess={(token) => setTurnstileToken(token)}
               />
-
-              { turnstileSiteKey }
 
               <div className="cp-footer">
                 <button type="submit" className="cp-btn">
