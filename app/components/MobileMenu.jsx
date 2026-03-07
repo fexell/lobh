@@ -10,7 +10,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
 
   // Stack of panels: each entry is { title, items }
   // Start with root panel (no title)
-  const [stack, setStack] = useState([{title: null, items: menu.items}]);
+  const [stack, setStack] = useState([{title: null, parentUrl: null, items: menu.items}]);
   const [direction, setDirection] = useState('forward'); // 'forward' | 'back'
   const [animating, setAnimating] = useState(false);
 
@@ -22,11 +22,11 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
     return isInternal ? new URL(url).pathname : url;
   };
 
-  const push = (title, items) => {
+  const push = (title, parentUrl, items) => {
     if (animating) return;
     setDirection('forward');
     setAnimating(true);
-    setStack((prev) => [...prev, {title, items}]);
+    setStack((prev) => [...prev, {title, parentUrl, items}]);
     setTimeout(() => setAnimating(false), 320);
   };
 
@@ -290,6 +290,29 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
         .mm-contact-link:hover {
           color: #7AC9EF;
         }
+
+        /* "See all" link at top of sub-panels */
+        .mm-see-all {
+          color: #7AC9EF !important;
+          font-size: 10px;
+          opacity: 0.8;
+          transition: opacity 0.2s !important;
+        }
+
+        .mm-see-all:hover {
+          opacity: 1;
+          background: rgba(122,201,239,0.05) !important;
+        }
+
+        .mm-see-all::before {
+          content: "";
+          display: inline-block;
+          width: 16px;
+          height: 1px;
+          background: #7AC9EF;
+          margin-right: 14px;
+          flex-shrink: 0;
+        }
       `}} />
 
       <div className="mm-wrap">
@@ -300,7 +323,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
           {depth > 0 ? (
             <button className="mm-back-btn" onClick={pop} aria-label="Go back">
               <FontAwesomeIcon icon={faChevronLeft} className="mm-back-icon" />
-              Tillbaka
+              Back
             </button>
           ) : (
             <div style={{width: 60}} />
@@ -326,6 +349,20 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
             key={depth} // re-mount triggers animation
             className={`mm-panel ${animating ? (direction === 'forward' ? 'enter-forward' : 'enter-back') : ''}`}
           >
+            {/* "See all" link — only on sub-panels */}
+            {current.parentUrl && (
+              <div className="mm-item">
+                <NavLink
+                  className="mm-link mm-see-all"
+                  to={current.parentUrl}
+                  prefetch="intent"
+                  onClick={close}
+                >
+                  Se alla {current.title}
+                </NavLink>
+              </div>
+            )}
+
             {current.items.map((item) => {
               if (!item.url) return null;
               const url = normalizeUrl(item.url);
@@ -336,7 +373,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
                   <div key={item.id} className="mm-item">
                     <button
                       className="mm-parent-btn"
-                      onClick={() => push(item.title, item.items)}
+                      onClick={() => push(item.title, url, item.items)}
                     >
                       <span>{item.title}</span>
                       <FontAwesomeIcon icon={faChevronRight} className="mm-chevron-right" />
