@@ -168,10 +168,16 @@ const MENU_FRAGMENT = `#graphql
   fragment ChildMenuItem on MenuItem {
     ...MenuItem
   }
+  fragment GrandchildMenuItem on MenuItem {
+    ...MenuItem
+  }
   fragment ParentMenuItem on MenuItem {
     ...MenuItem
     items {
       ...ChildMenuItem
+      items {
+        ...GrandchildMenuItem
+      }
     }
   }
   fragment Menu on Menu {

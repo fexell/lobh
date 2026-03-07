@@ -22,9 +22,7 @@ export function Aside({children, heading, type, classes}) {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500;600&display=swap');
-
+      <style dangerouslySetInnerHTML={{__html: `
         /* ── Overlay backdrop ── */
         .lc-overlay {
           position: fixed;
@@ -54,7 +52,7 @@ export function Aside({children, heading, type, classes}) {
 
         /* ── Aside panel ── */
         .lc-aside {
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           position: fixed;
           top: 0;
           right: 0;
@@ -88,7 +86,7 @@ export function Aside({children, heading, type, classes}) {
         }
 
         .lc-aside-heading {
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.22em;
@@ -268,7 +266,7 @@ export function Aside({children, heading, type, classes}) {
         }
 
         .lc-aside-footer .cart-subtotal-value {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: 22px;
           font-weight: 400;
           color: #fff;
@@ -282,7 +280,7 @@ export function Aside({children, heading, type, classes}) {
           padding: 14px 20px;
           background: #7AC9EF;
           color: #111;
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           font-size: 10px;
           font-weight: 700;
           letter-spacing: 0.2em;
@@ -368,7 +366,7 @@ export function Aside({children, heading, type, classes}) {
 
         /* Gold accent line below header */
         .lc-aside-header::after {
-          content: '';
+          content: "";
           position: absolute;
           bottom: -1px;
           left: 28px;
@@ -380,7 +378,7 @@ export function Aside({children, heading, type, classes}) {
         .lc-aside-header {
           position: relative;
         }
-      `}</style>
+      `}} />
 
       <div
         aria-modal

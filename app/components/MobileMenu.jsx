@@ -20,15 +20,13 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500;600&display=swap');
-
+      <style dangerouslySetInnerHTML={{__html: `
         .mm-wrap {
           display: flex;
           flex-direction: column;
           height: 100%;
           background: #141414;
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           overflow-y: auto;
           scrollbar-width: none;
         }
@@ -89,7 +87,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
 
         /* Active indicator bar */
         .mm-link.active::before {
-          content: '';
+          content: "";
           display: inline-block;
           width: 16px;
           height: 1px;
@@ -185,7 +183,7 @@ export function MyMobileMenu({header, publicStoreDomain, primaryDomainUrl}) {
           vertical-align: middle;
           opacity: 0.6;
         }
-      `}</style>
+      `}} />
 
       <div className="mm-wrap">
         {/* Gold accent */}

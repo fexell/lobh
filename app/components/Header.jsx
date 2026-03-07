@@ -299,48 +299,53 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
           max-width: 1280px;
           margin: 0 auto;
           padding: 40px 40px 48px;
-          display: grid;
-          grid-template-columns: repeat(3, 1fr) 280px;
-          gap: 0 32px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 40px 48px;
         }
 
         /* Column group */
         .lc-mega-col {
-          padding: 0 16px 32px;
-          border-right: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .lc-mega-col:last-of-type {
+          padding: 0;
           border-right: none;
+          min-width: 160px;
         }
 
         .lc-mega-heading {
           font-family: 'Montserrat', sans-serif;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 600;
-          letter-spacing: 0.18em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: rgba(255,255,255,0.35);
-          margin-bottom: 14px;
-          padding-bottom: 10px;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
+          color: rgba(255,255,255,0.9);
+          margin-bottom: 12px;
+          padding-bottom: 0;
+          border-bottom: none;
+          display: block;
+          text-decoration: none;
+          transition: color 0.15s;
+        }
+
+        .lc-mega-heading:hover {
+          color: #7AC9EF;
         }
 
         .lc-mega-link {
           display: block;
-          padding: 6px 0;
+          padding: 4px 0;
           font-size: 13px;
-          font-weight: 300;
-          letter-spacing: 0.03em;
-          color: rgba(255,255,255,0.7);
+          font-weight: 400;
+          letter-spacing: 0.02em;
+          color: rgba(255,255,255,0.45);
           text-decoration: none;
           transition: color 0.15s, padding-left 0.15s;
-          line-height: 1.5;
+          line-height: 1.6;
+          text-transform: none;
         }
 
         .lc-mega-link:hover {
-          color: #fff;
-          padding-left: 6px;
+          color: rgba(255,255,255,0.9);
+          padding-left: 0;
         }
 
         /* Branding panel on the right */
@@ -349,8 +354,9 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
           flex-direction: column;
           align-items: flex-end;
           justify-content: flex-end;
-          padding: 0 0 8px 24px;
-          gap: 8px;
+          margin-left: auto;
+          padding: 0;
+          gap: 6px;
         }
 
         .lc-mega-brand-icon {
@@ -677,7 +683,8 @@ function DropdownMenu({ item, close, shopName }) {
   const [isOpen, setOpen] = useState(false);
   const firstTap = useRef(true);
   const [isTouchDevice, setTouchDevice] = useState(false);
-  const isMega = item.items.length >= MEGA_THRESHOLD;
+  const isMega = item.items.length >= MEGA_THRESHOLD ||
+    item.items.some((child) => child.items?.length > 0);
 
   useEffect(() => {
     if (typeof window !== 'undefined')
@@ -721,15 +728,24 @@ function DropdownMenu({ item, close, shopName }) {
       {isOpen && isMega && (
         <div className="lc-dropdown-panel">
           <div className="lc-mega-inner">
-            {columns.map((col, ci) => (
-              <div key={ci} className="lc-mega-col">
-                {col.map(({ id, title, url }) => (
-                  <NavLink key={id} className="lc-mega-link" to={url} onClick={closeAll}>
-                    {title}
-                  </NavLink>
-                ))}
+            {item.items.map((group) => (
+              <div key={group.id} className="lc-mega-col">
+                {/* Group heading — links to the category page */}
+                <NavLink to={group.url} className="lc-mega-heading" onClick={closeAll}>
+                  {group.title}
+                </NavLink>
+
+                {/* Children under this group */}
+                {group.items?.length > 0 ? (
+                  group.items.map(({ id, title, url }) => (
+                    <NavLink key={id} className="lc-mega-link" to={url} onClick={closeAll}>
+                      {title}
+                    </NavLink>
+                  ))
+                ) : null}
               </div>
             ))}
+
             {/* Branding panel */}
             <div className="lc-mega-brand">
               <div className="lc-mega-brand-icon">K</div>

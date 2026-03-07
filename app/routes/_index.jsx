@@ -119,7 +119,7 @@ export default function Homepage() {
 
   return (
     <>
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         /* ── Theme variables (content only) ── */
         .hp[data-theme="dark"] {
           --hp-bg:                    #111;
@@ -171,7 +171,7 @@ export default function Homepage() {
 
         /* ── Globals for homepage ── */
         .hp {
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           background: var(--hp-bg);
           color: var(--hp-text);
           overflow-x: hidden;
@@ -242,7 +242,7 @@ export default function Homepage() {
         }
 
         .hp-hero-label::before {
-          content: '';
+          content: "";
           display: inline-block;
           width: 32px;
           height: 1px;
@@ -250,7 +250,7 @@ export default function Homepage() {
         }
 
         .hp-hero-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: clamp(42px, 6vw, 80px);
           font-weight: 300;
           line-height: 1.1;
@@ -301,7 +301,7 @@ export default function Homepage() {
           padding: 14px 32px;
           background: var(--hp-accent);
           color: var(--hp-btn-text);
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           font-size: 10px;
           font-weight: 700;
           letter-spacing: 0.2em;
@@ -322,7 +322,7 @@ export default function Homepage() {
           padding: 14px 32px;
           background: transparent;
           color: var(--hp-btn-sec-color);
-          font-family: 'Montserrat', sans-serif;
+          font-family: "Montserrat", sans-serif;
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0.2em;
@@ -363,7 +363,7 @@ export default function Homepage() {
         }
 
         .hp-section-label::before {
-          content: '';
+          content: "";
           display: inline-block;
           width: 24px;
           height: 1px;
@@ -371,7 +371,7 @@ export default function Homepage() {
         }
 
         .hp-section-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: clamp(32px, 4vw, 52px);
           font-weight: 300;
           line-height: 1.15;
@@ -420,7 +420,7 @@ export default function Homepage() {
         }
 
         .hp-about-img-wrap::before {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
           border: 1px solid var(--hp-img-border);
@@ -513,7 +513,7 @@ export default function Homepage() {
         }
 
         .hp-product-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: clamp(28px, 3.5vw, 44px);
           font-weight: 400;
           color: var(--hp-heading);
@@ -522,7 +522,7 @@ export default function Homepage() {
         }
 
         .hp-product-price {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: 28px;
           font-weight: 300;
           color: var(--hp-accent);
@@ -560,7 +560,7 @@ export default function Homepage() {
         }
 
         .hp-why-header .hp-section-label::after {
-          content: '';
+          content: "";
           display: inline-block;
           width: 24px;
           height: 1px;
@@ -586,7 +586,7 @@ export default function Homepage() {
         }
 
         .hp-card::before {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           left: 0;
@@ -619,7 +619,7 @@ export default function Homepage() {
         }
 
         .hp-card-num {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: 48px;
           font-weight: 300;
           color: var(--hp-card-num);
@@ -628,7 +628,7 @@ export default function Homepage() {
         }
 
         .hp-card-title {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-size: 24px;
           font-weight: 400;
           color: var(--hp-heading);
@@ -661,7 +661,7 @@ export default function Homepage() {
         .hp-cms-inner h1,
         .hp-cms-inner h2,
         .hp-cms-inner h3 {
-          font-family: 'Cormorant Garamond', serif;
+          font-family: "Cormorant Garamond", serif;
           font-weight: 300;
           color: var(--hp-heading);
           margin-top: 2em;
@@ -696,7 +696,7 @@ export default function Homepage() {
           border-top: 1px solid var(--hp-cms-hr);
           margin: 2.5em 0;
         }
-      `}</style>
+      `}} />
 
       <div className="hp" data-theme={theme}>
 

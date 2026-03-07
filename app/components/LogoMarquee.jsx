@@ -26,13 +26,15 @@
  *   label?: string;   // optional label above the strip
  * }}
  */
+import React from 'react';
+
 export function LogoMarquee({logos, speed = 120, label = 'Företag som litar på oss'}) {
   // Duplicate logos so the seam is invisible
   const doubled = [...logos, ...logos, ...logos, ...logos, ...logos, ...logos];
 
   return (
     <>
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         .lm-section {
           background: #141414;
           border-top: 1px solid rgba(255,255,255,0.05);
@@ -122,7 +124,7 @@ export function LogoMarquee({logos, speed = 120, label = 'Företag som litar på
           background: rgba(122,201,239,0.15);
           flex-shrink: 0;
         }
-      `}</style>
+      `}} />
 
       <div className="lm-section">
         {label && <div className="lm-label">{label}</div>}
@@ -132,12 +134,12 @@ export function LogoMarquee({logos, speed = 120, label = 'Företag som litar på
             style={{'--lm-speed': `${speed}s`}}
           >
             {doubled.map((logo, i) => (
-              <>
+              <React.Fragment key={i}>
                 <div key={`logo-${i}`} className="lm-logo">
                   <img src={logo.src} alt={logo.alt} draggable={false} />
                 </div>
                 <div key={`sep-${i}`} className="lm-sep" />
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>
