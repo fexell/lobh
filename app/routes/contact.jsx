@@ -1,4 +1,5 @@
 // app/routes/contact.jsx
+import { useState } from 'react';
 import { json } from "@remix-run/server-runtime";
 import { Form, useLoaderData, useActionData, useNavigation } from "@remix-run/react";
 import { Resend } from 'resend';
@@ -8,12 +9,12 @@ import { z } from "zod";
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
-function FieldError({ errors, field }) {
-  const msg = errors?.fieldErrors?.[field]?.[0];
-  if (!msg) return null;
+function FieldError({ touched, name, value, text }) {
+  if (!touched) return null;
+  if (value && String(value).trim().length >= 2) return null;
   return (
-    <span style={{ fontSize: '11px', color: 'var(--cp-accent)', marginTop: '-4px' }}>
-      {msg}
+    <span style={{ fontSize: '11px', color: 'var(--cp-error)' }}>
+      {text || 'Detta fält är obligatoriskt.'}
     </span>
   );
 }
@@ -220,6 +221,11 @@ export async function action({ request, context }) {
 }
 
 export default function ContactPage() {
+  const [touched, setTouched] = useState({});
+  const handleBlur = (e) => setTouched(prev => ({ ...prev, [e.target.name]: true }));
+  const [values, setValues] = useState({});
+  const handleChange = (e) => setValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
   const actionData = useActionData();
   const { theme } = useTheme();
   const { turnstileSiteKey } = useLoaderData();
@@ -255,6 +261,7 @@ export default function ContactPage() {
           --cp-select-arrow:      rgba(255,255,255,0.2);
           --cp-sent-title:        #fff;
           --cp-sent-sub:          rgba(255,255,255,0.4);
+          --cp-error:             #ff6b6b;
         }
 
         .cp[data-theme="light"] {
@@ -281,6 +288,7 @@ export default function ContactPage() {
           --cp-select-arrow:      rgba(30,30,30,0.25);
           --cp-sent-title:        #111;
           --cp-sent-sub:          rgba(30,30,30,0.45);
+          --cp-error:             #ff6b6b;
         }
 
         /* ── Base ── */
@@ -649,9 +657,11 @@ export default function ContactPage() {
                     type="text"
                     placeholder="Ditt namn"
                     autoComplete="name"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
                     required
                   />
-                  <FieldError errors={actionData?.errors} field="name" />
+                  <FieldError touched={touched.name} name="name" value={values.name} />
                 </div>
                 <div className="cp-field">
                   <label className="cp-label" htmlFor="email">E-post</label>
@@ -662,9 +672,11 @@ export default function ContactPage() {
                     type="email"
                     placeholder="din@email.se"
                     autoComplete="email"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
                     required
                   />
-                  <FieldError errors={actionData?.errors} field="email" />
+                  <FieldError touched={touched.email} name="email" value={values.email} />
                 </div>
               </div>
 
@@ -676,6 +688,8 @@ export default function ContactPage() {
                   name="phone"
                   type="tel"
                   placeholder="08-123 456 78"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
                   autoComplete="tel"
                 />
               </div>
@@ -689,6 +703,8 @@ export default function ContactPage() {
                     name="subject"
                     required
                     defaultValue=""
+                    onBlur={handleBlur}
+                    onChange={handleChange}
                   >
                     <option value="" disabled>Välj ett ämne…</option>
                     <option value="order">Beställning / Order</option>
@@ -700,7 +716,7 @@ export default function ContactPage() {
                   </select>
                   <span className="cp-select-arrow">▼</span>
                 </div>
-                <FieldError errors={actionData?.errors} field="subject" />
+                <FieldError touched={touched.subject} name="subject" value={values.subject} />
               </div>
 
               <div className="cp-field">
@@ -710,17 +726,19 @@ export default function ContactPage() {
                   className="cp-textarea"
                   name="message"
                   placeholder="Beskriv ditt ärende…"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
                   required
                 />
-                <FieldError errors={actionData?.errors} field="message" />
+                <FieldError touched={touched.message} name="message" value={values.message} />
               </div>
 
               {actionData?.error && (
-                <p style={{ fontSize: '11px', color: 'var(--cp-accent)', margin: 0 }}>
+                <p style={{ fontSize: '11px', color: 'var(--cp-error)', margin: 0 }}>
                   {actionData.error}
                 </p>
               )}
-              
+
               <Turnstile
                 siteKey={turnstileSiteKey}
               />
