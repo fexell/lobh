@@ -8,6 +8,16 @@ import { z } from "zod";
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
+function FieldError({ errors, field }) {
+  const msg = errors?.fieldErrors?.[field]?.[0];
+  if (!msg) return null;
+  return (
+    <span style={{ fontSize: '11px', color: 'var(--cp-accent)', marginTop: '-4px' }}>
+      {msg}
+    </span>
+  );
+}
+
 export async function loader({context}) {
   return json({ turnstileSiteKey: context.env.VITE_TURNSTILE_SITE_KEY });
 }
@@ -129,7 +139,9 @@ export async function action({ request, context }) {
                             Telefon
                           </p>
                           <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
-                            ${phone || "Ej angivet"}
+                            ${phone
+                              ? `<a href="tel:${phone}" style="color:#7AC9EF;text-decoration:none;">${phone}</a>`
+                              : `<span style="color:#555555;font-style:italic;">Inget telefonnummer angivet.</span>`}
                           </p>
                         </td>
                       </tr>
@@ -159,7 +171,7 @@ export async function action({ request, context }) {
                             Meddelande
                           </p>
                           <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.75;white-space:pre-wrap;">
-                            ${message}
+                            ${message.trim()}
                           </p>
                         </td>
                       </tr>
@@ -639,6 +651,7 @@ export default function ContactPage() {
                     autoComplete="name"
                     required
                   />
+                  <FieldError errors={actionData?.errors} field="name" />
                 </div>
                 <div className="cp-field">
                   <label className="cp-label" htmlFor="email">E-post</label>
@@ -651,6 +664,7 @@ export default function ContactPage() {
                     autoComplete="email"
                     required
                   />
+                  <FieldError errors={actionData?.errors} field="email" />
                 </div>
               </div>
 
@@ -686,6 +700,7 @@ export default function ContactPage() {
                   </select>
                   <span className="cp-select-arrow">▼</span>
                 </div>
+                <FieldError errors={actionData?.errors} field="subject" />
               </div>
 
               <div className="cp-field">
@@ -697,8 +712,15 @@ export default function ContactPage() {
                   placeholder="Beskriv ditt ärende…"
                   required
                 />
+                <FieldError errors={actionData?.errors} field="message" />
               </div>
 
+              {actionData?.error && (
+                <p style={{ fontSize: '11px', color: 'var(--cp-accent)', margin: 0 }}>
+                  {actionData.error}
+                </p>
+              )}
+              
               <Turnstile
                 siteKey={turnstileSiteKey}
               />
