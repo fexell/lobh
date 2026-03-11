@@ -688,8 +688,6 @@ export default function ContactPage() {
                   name="phone"
                   type="tel"
                   placeholder="08-123 456 78"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
                   autoComplete="tel"
                 />
               </div>
