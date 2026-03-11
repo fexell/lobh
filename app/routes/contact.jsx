@@ -1,25 +1,38 @@
 // app/routes/contact.jsx
 import { json } from "@remix-run/server-runtime";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useLoaderData, useActionData, useNavigation } from "@remix-run/react";
 import { Resend } from 'resend';
 import { useTheme } from '~/components/PageLayout';
 import {Turnstile} from '@marsidev/react-turnstile';
-import { useLoaderData } from "@remix-run/react";
+import { z } from "zod";
 
 export const meta = () => [{title: 'Ljud & Bild Hörnan | Kontakt'}];
 
 export async function loader({context}) {
-  console.log('TURNSTILE_SITE_KEY:', context.env.VITE_TURNSTILE_SITE_KEY);
   return json({ turnstileSiteKey: context.env.VITE_TURNSTILE_SITE_KEY });
 }
 
 export async function action({ request, context }) {
   const formData = await request.formData();
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const subject = formData.get("subject");
-  const message = formData.get("message");
-  const token = formData.get("cf-turnstile-response");
+  const formValues = Object.fromEntries(formData);
+
+  const contactSchema = z.object({
+    name: z.string().trim().min(2, "Ange ditt namn."),
+    email: z.string().trim().email("Ange en giltig e-postadress."),
+    phone: z.string().trim().optional(),
+    subject: z.string().trim().min(2, "Ange ett ämne."),
+    message: z.string().trim().min(2, "Ange ett meddelande."),
+  })
+
+  const validationResult = contactSchema.safeParse(formValues);
+
+  if( !validationResult.success ) {
+    return json({ errors: validationResult.error.flatten() }, { status: 400 });
+  }
+
+  const { name, email, phone, subject, message } = validationResult.data;
+
+  const token = formValues['cf-turnstile-response'];
 
   const verifyRes = await fetch(
     'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -38,14 +51,14 @@ export async function action({ request, context }) {
   const verifyData = await verifyRes.json();
 
   if (!verifyData.success) {
-    return json({ error: 'Invalid token' }, { status: 400 });
+    return json({ error: 'Ogiltig captcha.' }, { status: 400 });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend = new Resend(context.env.RESEND_API_KEY);
 
   await resend.emails.send({
     from: 'onboarding@resend.dev',
-    to: process.env.CONTACT_FORM_TO,
+    to: context.env.CONTACT_FORM_TO,
     subject: `Nytt kontaktformulärsmeddelande: ${subject}`,
     html: `
       <!DOCTYPE html>
@@ -102,6 +115,21 @@ export async function action({ request, context }) {
                           </p>
                           <p style="margin:0;font-size:15px;font-weight:300;line-height:1.5;">
                             <a href="mailto:${email}" style="color:#7AC9EF;text-decoration:none;">${email}</a>
+                          </p>
+                        </td>
+                      </tr>
+
+                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
+                      <tr><td style="padding-bottom:24px;"></td></tr>
+
+                      <!-- Phone -->
+                      <tr>
+                        <td style="padding-bottom:24px;">
+                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                            Telefon
+                          </p>
+                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
+                            ${phone || "Ej angivet"}
                           </p>
                         </td>
                       </tr>
@@ -183,6 +211,9 @@ export default function ContactPage() {
   const actionData = useActionData();
   const { theme } = useTheme();
   const { turnstileSiteKey } = useLoaderData();
+
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <>
@@ -605,6 +636,7 @@ export default function ContactPage() {
                     name="name"
                     type="text"
                     placeholder="Ditt namn"
+                    autoComplete="name"
                     required
                   />
                 </div>
@@ -616,9 +648,22 @@ export default function ContactPage() {
                     name="email"
                     type="email"
                     placeholder="din@email.se"
+                    autoComplete="email"
                     required
                   />
                 </div>
+              </div>
+
+              <div className="cp-field">
+                <label className="cp-label" htmlFor="phone">Telefon (valfritt)</label>
+                <input
+                  id="phone"
+                  className="cp-input"
+                  name="phone"
+                  type="tel"
+                  placeholder="08-123 456 78"
+                  autoComplete="tel"
+                />
               </div>
 
               <div className="cp-field">
@@ -655,13 +700,12 @@ export default function ContactPage() {
               </div>
 
               <Turnstile
-                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
-                onSuccess={(token) => setTurnstileToken(token)}
+                siteKey={turnstileSiteKey}
               />
 
               <div className="cp-footer">
-                <button type="submit" className="cp-btn">
-                  Skicka meddelande →
+                <button type="submit" className="cp-btn" disabled={isSubmitting}>
+                  {isSubmitting ? "Skickar..." : "Skicka meddelande →"}
                 </button>
               </div>
 
