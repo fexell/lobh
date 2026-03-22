@@ -509,7 +509,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
       <header className="lc-header">
         {/* Announcement bar */}
         <div className="lc-announcement">
-          <NavLink to="/contact">Kontakta teamet för personlig service</NavLink>
+          <NavLink to="/contact">Kontakta oss</NavLink>
         </div>
 
         {/* Main nav */}

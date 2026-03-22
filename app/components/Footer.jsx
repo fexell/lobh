@@ -326,10 +326,6 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                     <div>302 41, Halmstad</div>
                     <br />
                     <div>
-                      Telefon:{' '}
-                      <a href="tel:035191100">035 - 19 11 00</a>
-                    </div>
-                    <div>
                       E-mail:{' '}
                       <a href="mailto:info@yourstore.se">info@yourstore.se</a>
                     </div>

@@ -19,9 +19,11 @@ export const meta = ({data}) => [
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
-  const deferredData = loadDeferredData(args);
+  return redirect('/maintenance', {status: 302});
+  
+  /* const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+  return defer({...deferredData, ...criticalData}); */
 }
 
 async function loadCriticalData({context, params, request}) {

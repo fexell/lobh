@@ -7,25 +7,33 @@ import { LogoMarquee } from '~/components/LogoMarquee';
 import { useTheme } from '~/components/PageLayout';
 
 import Banner1 from '../assets/banner-4.jpg';
-import ContentImage1 from '../assets/banner-1.jpg';
-import CardImage1 from '../assets/cards/card-image-1_small.jpg';
-import CardImage2 from '../assets/cards/card-image-2_small.jpg';
-import CardImage3 from '../assets/cards/card-image-3_small.jpg';
+import ContentImage1 from '../assets/MacBook.jpg';
+import CardImage1 from '../assets/cards/Washing_Machine_Bosch.webp';
+import CardImage2 from '../assets/cards/Electrolux_Washing_Machine.avif';
+import CardImage3 from '../assets/cards/AudioPro_Speaker.webp';
 
 import AppleLogo from '../assets/slide/apple_logo_white.png';
 import SamsungLogo from '../assets/slide/samsung-logo.avif';
-import LgLogo from '../assets/slide/lg-logo.avif';
 import ElectroluxLogo from '../assets/slide/electrolux_logo_white.png';
 import BoschLogo from '../assets/slide/bosch_symbol_logo_white.png';
 import MieleLogo from '../assets/slide/Miele-logo.png';
+import SiemensLogo from '../assets/slide/Color-Siemens-Logo.webp';
+import AudioProLogo from '../assets/slide/Audio_Pro_Logo_White.png';
+import PhilipsLogo from '../assets/slide/philips-logo-png_seeklogo-108440.png';
+import PanasonicLogo from '../assets/slide/Panasonic_logo.png';
+import AsusLogo from '../assets/slide/ASUS_Logo_White.png';
 
 const LOGOS = [
   { src: AppleLogo, alt: 'Apple' },
   { src: SamsungLogo, alt: 'Samsung' },
-  { src: LgLogo, alt: 'LG' },
   { src: ElectroluxLogo, alt: 'Electrolux' },
   { src: BoschLogo, alt: 'Bosch' },
   { src: MieleLogo, alt: 'Miele' },
+  { src: SiemensLogo, alt: 'Siemens' },
+  { src: AudioProLogo, alt: 'Audio Pro' },
+  { src: PhilipsLogo, alt: 'Philips' },
+  { src: PanasonicLogo, alt: 'Panasonic' },
+  { src: AsusLogo, alt: 'Asus' },
 ]
 
 /* ─── GraphQL queries (unchanged) ──────────────────────────────────────── */
@@ -531,7 +539,7 @@ export default function Homepage() {
 
         /* ── Why us / cards ── */
         .hp-why {
-          background: var(--hp-bg-alt);
+          background: var(--hp-bg);
           border-top: 1px solid var(--hp-border);
         }
 
@@ -765,7 +773,7 @@ export default function Homepage() {
         </section>
 
         {/* ── Best seller ── */}
-        {bestSeller && (
+        {/* {bestSeller && (
           <section className="hp-bestseller">
             <div className="hp-bestseller-inner">
               <div className="hp-bestseller-img">
@@ -792,7 +800,7 @@ export default function Homepage() {
               </div>
             </div>
           </section>
-        )}
+        )} */}
 
         {/* ── Why us / cards ── */}
         <section className="hp-why">

@@ -136,7 +136,7 @@ export function LogoMarquee({logos, speed = 120, label = 'Företag som litar på
             {doubled.map((logo, i) => (
               <React.Fragment key={i}>
                 <div key={`logo-${i}`} className="lm-logo">
-                  <img src={logo.src} alt={logo.alt} draggable={false} />
+                  <img src={logo.src} alt={logo.alt} draggable={false} style={{ height: '100px' }} />
                 </div>
                 <div key={`sep-${i}`} className="lm-sep" />
               </React.Fragment>

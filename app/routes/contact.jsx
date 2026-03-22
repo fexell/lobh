@@ -625,12 +625,6 @@ export default function ContactPage() {
             </div>
             <div className="cp-divider" />
             <div className="cp-info-block">
-              <div className="cp-info-label">Telefon</div>
-              <div className="cp-info-value">08-123 456 78</div>
-              <div className="cp-info-note">Mån–fre, 09:00–17:00</div>
-            </div>
-            <div className="cp-divider" />
-            <div className="cp-info-block">
               <div className="cp-info-label">Besöksadress</div>
               <div className="cp-info-value">Exempelgatan 12<br />123 45 Stockholm</div>
               <div className="cp-info-note">Öppet mån–lör, 10:00–18:00</div>
