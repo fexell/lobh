@@ -13,7 +13,7 @@ import CardImage2 from '../assets/cards/Electrolux_Washing_Machine.avif';
 import CardImage3 from '../assets/cards/AudioPro_Speaker.webp';
 
 import AppleLogo from '../assets/slide/apple_logo_white.png';
-import SamsungLogo from '../assets/slide/samsung-logo.avif';
+import SamsungLogo from '../assets/slide/Samsung_Orig_Wordmark_WHITE_RGB.png';
 import ElectroluxLogo from '../assets/slide/electrolux_logo_white.png';
 import BoschLogo from '../assets/slide/bosch_symbol_logo_white.png';
 import MieleLogo from '../assets/slide/Miele-logo.png';
