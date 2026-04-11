@@ -68,7 +68,7 @@ export async function action({ request, context }) {
   const resend = new Resend(context.env.RESEND_API_KEY);
 
   await resend.emails.send({
-    from: 'onboarding@resend.dev',
+    from: 'kontakt@ljudochbildhornan.se',
     to: context.env.CONTACT_FORM_TO,
     subject: `Nytt kontaktformulärsmeddelande: ${subject}`,
     html: `
