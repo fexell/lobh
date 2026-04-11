@@ -20,7 +20,7 @@ export default function FreeMap() {
       // Initialize map
       if (!mapRef.current._leaflet_id) {
         const map = L.map(mapRef.current).setView(
-          [58.99411296202158, 16.20405045179885],
+          [58.99435315398727, 16.204195497366467],
           18
         );
 
@@ -29,7 +29,7 @@ export default function FreeMap() {
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(map);
 
-        L.marker([58.99411296202158, 16.20405045179885])
+        L.marker([58.99435315398727, 16.204195497366467])
           .addTo(map)
           .bindPopup("Här är vi lokaliserade!")
           .openPopup();
