@@ -75,13 +75,13 @@ export async function action({ request, context }) {
     installation: 'Installation',
     other: 'Övrigt',
   };
-  
+
   const subjectLabel = subjectLabels[subject] ?? subject;
 
   await resend.emails.send({
     from: 'kontakt@ljudochbildhornan.se',
     to: context.env.CONTACT_FORM_TO,
-    subject: `Nytt kontaktformulärsmeddelande: ${subject}`,
+    subject: `Nytt kontaktformulärsmeddelande: ${subjectLabel}`,
     html: `
       <!DOCTYPE html>
       <html lang="sv">
