@@ -359,7 +359,7 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                   <div className="lc-footer-hours">
                     <div className="lc-footer-hours-name">Installation</div>
                     <div className="lc-footer-hours-row"><span>Mån – Fre</span><span>10.00 – 17.00</span></div>
-                    <div className="lc-footer-hours-row"><span>Lördag - Söndag</span><span>10.00 – 17.00</span></div>
+                    <div className="lc-footer-hours-row"><span>Lördag - Söndag</span><span>Stängt</span></div>
                   </div>
                 </div>
 
