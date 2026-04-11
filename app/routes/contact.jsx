@@ -67,6 +67,17 @@ export async function action({ request, context }) {
 
   const resend = new Resend(context.env.RESEND_API_KEY);
 
+  const subjectLabels = {
+    order: 'Beställning / Order',
+    return: 'Retur / Byte',
+    product: 'Produktfråga',
+    shipping: 'Leverans',
+    installation: 'Installation',
+    other: 'Övrigt',
+  };
+  
+  const subjectLabel = subjectLabels[subject] ?? subject;
+
   await resend.emails.send({
     from: 'kontakt@ljudochbildhornan.se',
     to: context.env.CONTACT_FORM_TO,
@@ -79,130 +90,119 @@ export async function action({ request, context }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Nytt meddelande</title>
       </head>
-      <body style="margin:0;padding:0;background:#111111;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+      <body style="margin:0;padding:0;background:#f4f4f0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
 
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#111111;padding:48px 24px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f0;padding:40px 24px;">
           <tr>
             <td align="center">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:540px;">
 
-                <!-- Header -->
+                <!-- Header (mörk) -->
                 <tr>
-                  <td style="padding-bottom:32px;border-bottom:1px solid #222222;">
-                    <p style="margin:0 0 12px 0;font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:#7AC9EF;">
-                      Ljud &amp; Bild Hörnan
+                  <td style="background:#111111;border-radius:12px 12px 0 0;padding:32px 36px 28px;text-align:center;">
+                    <p style="margin:0 0 10px 0;font-size:11px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#888888;">
+                      ${name}
                     </p>
-                    <h1 style="margin:0;font-size:28px;font-weight:300;color:#ffffff;line-height:1.2;letter-spacing:-0.01em;">
+                    <h1 style="margin:0;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;">
                       Nytt kontaktmeddelande
                     </h1>
                   </td>
                 </tr>
 
-                <!-- Fields -->
+                <!-- Body (ljus) -->
                 <tr>
-                  <td style="padding:32px 0;">
-                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <td style="background:#ffffff;border-radius:0 0 12px 12px;padding:8px 0 28px;">
 
-                      <!-- Name -->
+                    <!-- Från-kort -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:0 28px;margin-bottom:0;">
                       <tr>
-                        <td style="padding-bottom:24px;">
-                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                            Namn
-                          </p>
-                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
-                            ${name}
-                          </p>
+                        <td style="padding:20px 0 4px;">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                            style="background:#f8f8f6;border:1px solid #ebebeb;border-radius:10px;padding:16px 20px;">
+                            <tr>
+                              <td>
+                                <p style="margin:0 0 4px 0;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#999999;">
+                                  Från
+                                </p>
+                                <p style="margin:0 0 2px 0;font-size:15px;font-weight:700;color:#111111;line-height:1.4;">
+                                  ${name}
+                                </p>
+                                <p style="margin:0;font-size:13px;color:#888888;line-height:1.4;">
+                                  <a href="mailto:${email}" style="color:#888888;text-decoration:none;">${email}</a>
+                                  ${phone ? `&nbsp;&middot;&nbsp;<a href="tel:${phone}" style="color:#888888;text-decoration:none;">${phone}</a>` : ''}
+                                </p>
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                       </tr>
+                    </table>
 
-                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                      <tr><td style="padding-bottom:24px;"></td></tr>
+                    <!-- Divider -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:0 28px;">
+                      <tr><td style="padding:16px 0 0;border-bottom:1px solid #eeeeee;"></td></tr>
+                    </table>
 
-                      <!-- Email -->
+                    <!-- Ämne -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:0 28px;">
                       <tr>
-                        <td style="padding-bottom:24px;">
-                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                            E-post
-                          </p>
-                          <p style="margin:0;font-size:15px;font-weight:300;line-height:1.5;">
-                            <a href="mailto:${email}" style="color:#7AC9EF;text-decoration:none;">${email}</a>
-                          </p>
-                        </td>
-                      </tr>
-
-                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                      <tr><td style="padding-bottom:24px;"></td></tr>
-
-                      <!-- Phone -->
-                      <tr>
-                        <td style="padding-bottom:24px;">
-                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
-                            Telefon
-                          </p>
-                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
-                            ${phone
-                              ? `<a href="tel:${phone}" style="color:#7AC9EF;text-decoration:none;">${phone}</a>`
-                              : `<span style="color:#555555;font-style:italic;">Inget telefonnummer angivet.</span>`}
-                          </p>
-                        </td>
-                      </tr>
-
-                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                      <tr><td style="padding-bottom:24px;"></td></tr>
-
-                      <!-- Subject -->
-                      <tr>
-                        <td style="padding-bottom:24px;">
-                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                        <td style="padding-top:20px;padding-bottom:4px;">
+                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#999999;">
                             Ämne
                           </p>
-                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.5;">
-                            ${subject}
+                          <p style="margin:0;font-size:15px;font-weight:600;color:#111111;line-height:1.5;">
+                            ${subjectLabel}
                           </p>
                         </td>
                       </tr>
+                    </table>
 
-                      <tr><td style="padding-bottom:24px;border-bottom:1px solid #222222;"></td></tr>
-                      <tr><td style="padding-bottom:24px;"></td></tr>
+                    <!-- Divider -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:0 28px;">
+                      <tr><td style="padding:16px 0 0;border-bottom:1px solid #eeeeee;"></td></tr>
+                    </table>
 
-                      <!-- Message -->
+                    <!-- Meddelande -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:0 28px;">
                       <tr>
-                        <td>
-                          <p style="margin:0 0 6px 0;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#7AC9EF;">
+                        <td style="padding-top:20px;">
+                          <p style="margin:0 0 10px 0;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#999999;">
                             Meddelande
                           </p>
-                          <p style="margin:0;font-size:15px;font-weight:300;color:#ffffff;line-height:1.75;white-space:pre-wrap;">
-                            ${message.trim()}
-                          </p>
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="border-left:3px solid #dddddd;padding:2px 0 2px 14px;">
+                                <p style="margin:0;font-size:14px;font-weight:400;color:#333333;line-height:1.75;white-space:pre-wrap;">
+                                  ${message.trim()}
+                                </p>
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                       </tr>
-
                     </table>
-                  </td>
-                </tr>
 
-                <!-- Reply CTA -->
-                <tr>
-                  <td style="padding-top:8px;border-top:1px solid #222222;">
-                    <table cellpadding="0" cellspacing="0" border="0">
+                    <!-- Svara-knapp -->
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding:0 28px;">
                       <tr>
-                        <td style="padding-top:24px;">
+                        <td style="padding-top:28px;text-align:center;">
                           <a href="mailto:${email}"
-                             style="display:inline-block;padding:12px 28px;background:#7AC9EF;color:#111111;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;text-decoration:none;border-radius:3px;">
-                            Svara på meddelandet →
+                            style="display:inline-block;padding:12px 32px;background:#111111;color:#ffffff;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;border-radius:6px;">
+                            Svara på meddelandet
                           </a>
                         </td>
                       </tr>
                     </table>
+
                   </td>
                 </tr>
 
                 <!-- Footer -->
                 <tr>
-                  <td style="padding-top:40px;">
-                    <p style="margin:0;font-size:11px;font-weight:300;color:#444444;line-height:1.7;">
-                      Detta e-postmeddelande skickades automatiskt via kontaktformuläret på
-                      <a href="https://ljudochbildhornan.se" style="color:#555555;text-decoration:none;">ljudochbildhornan.se</a>.
+                  <td style="padding-top:20px;text-align:center;">
+                    <p style="margin:0;font-size:11px;color:#aaaaaa;line-height:1.7;">
+                      Skickat via kontaktformuläret på
+                      <a href="https://ljudochbildhornan.se" style="color:#aaaaaa;text-decoration:none;">ljudochbildhornan.se</a>
                     </p>
                   </td>
                 </tr>
