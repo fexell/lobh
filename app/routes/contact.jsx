@@ -620,13 +620,13 @@ export default function ContactPage() {
           <div className="cp-info">
             <div className="cp-info-block">
               <div className="cp-info-label">E-post</div>
-              <div className="cp-info-value">info@butiken.se</div>
+              <div className="cp-info-value">butik@katrineholmhemel.se</div>
               <div className="cp-info-note">Vi svarar inom 1–2 arbetsdagar.</div>
             </div>
             <div className="cp-divider" />
             <div className="cp-info-block">
               <div className="cp-info-label">Besöksadress</div>
-              <div className="cp-info-value">Exempelgatan 12<br />123 45 Stockholm</div>
+              <div className="cp-info-value">Drottninggatan 8<br />641 30, Katrineholm</div>
               <div className="cp-info-note">Öppet mån–lör, 10:00–18:00</div>
             </div>
           </div>
@@ -736,7 +736,7 @@ export default function ContactPage() {
               />
 
               <div className="cp-footer">
-                <button type="submit" className="cp-btn" disabled={isSubmitting}>
+                <button type="submit" className="cp-btn disabled:bg-neutral-500!" disabled={isSubmitting}>
                   {isSubmitting ? "Skickar..." : "Skicka meddelande →"}
                 </button>
               </div>

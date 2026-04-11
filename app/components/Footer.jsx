@@ -322,12 +322,12 @@ export function Footer({footer: footerPromise, header, publicStoreDomain}) {
                   </NavLink>
 
                   <div className="lc-footer-address">
-                    <div>Knut Peters väg 42</div>
-                    <div>302 41, Halmstad</div>
+                    <div>Drottninggatan 8</div>
+                    <div>641 30, Katrineholm</div>
                     <br />
                     <div>
                       E-mail:{' '}
-                      <a href="mailto:info@yourstore.se">info@yourstore.se</a>
+                      <a href="mailto:info@yourstore.se">butik@katrineholmhemel.se</a>
                     </div>
                   </div>
 
