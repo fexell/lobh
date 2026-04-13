@@ -13,9 +13,10 @@ import {ProductForm} from '~/components/ProductForm';
 import {useTheme} from '~/components/PageLayout';
 
 /** @type {MetaFunction<typeof loader>} */
-export const meta = ({data}) => [
-  {title: `${data?.product.title ?? 'Produkt'} | Butiken`},
-];
+export const meta = ({ data }) => {
+  const title = data?.product?.title ?? 'Produkt';
+  return [{ title: `${title} | Butiken` }];
+};
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
