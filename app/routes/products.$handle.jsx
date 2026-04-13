@@ -1,5 +1,5 @@
 import {Suspense, useState, useRef, useEffect} from 'react';
-import {defer, redirect} from '@netlify/remix-runtime';
+import {defer, redirect, json} from '@netlify/remix-runtime';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {
   getSelectedProductOptions,
@@ -24,7 +24,7 @@ export async function loader(args) {
   
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+  return json({...deferredData, ...criticalData});
 }
 
 async function loadCriticalData({context, params, request}) {

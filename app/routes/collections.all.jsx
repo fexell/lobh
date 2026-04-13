@@ -1,4 +1,4 @@
-import {defer, redirect} from '@netlify/remix-runtime';
+import {defer, redirect, json} from '@netlify/remix-runtime';
 import {useLoaderData, Link, useNavigate, useLocation} from '@remix-run/react';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
@@ -25,7 +25,7 @@ export async function loader(args) {
 
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+  return json({...deferredData, ...criticalData});
 }
 
 async function loadCriticalData({context, request}) {
