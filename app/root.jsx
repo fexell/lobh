@@ -1,5 +1,5 @@
 import {useNonce, getShopAnalytics, Analytics} from '@shopify/hydrogen';
-import {defer} from '@netlify/remix-runtime';
+import {json} from '@netlify/remix-runtime';
 import {
   Links,
   Meta,
@@ -170,44 +170,37 @@ export function links() {
  * @param {LoaderFunctionArgs} args
  */
 export async function loader(args) {
-  const {storefront, env} = args.context;
+  const {storefront, customerAccount, cart, env} = args.context;
 
-  // Start fetching non-critical data without blocking TTFB
-  const deferredData = loadDeferredData(args);
+  const [header, cartData, isLoggedIn, footer] = await Promise.all([
+    storefront.query(HEADER_QUERY, {
+      variables: {headerMenuHandle: 'main-menu'},
+    }),
+    cart.get(),
+    customerAccount.isLoggedIn(),
+    storefront.query(FOOTER_QUERY, {
+      variables: {footerMenuHandle: 'footer'},
+    }).catch((error) => {
+      console.error(error);
+      return null;
+    }),
+  ]);
 
-  // Critical data with caching
-  const criticalData = await loadCriticalData({
-    ...args,
-    context: {
-      ...args.context,
-      storefront: {
-        ...storefront,
-        cache: storefront.CacheShort(), // <— viktig caching
-      },
+  return json({
+    header,
+    cart: cartData,
+    isLoggedIn,
+    footer,
+    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    shop: getShopAnalytics({
+      storefront,
+      publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
+    }),
+    consent: {
+      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
     },
   });
-
-  return defer(
-    {
-      ...deferredData,
-      ...criticalData,
-      publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-      shop: getShopAnalytics({
-        storefront,
-        publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
-      }),
-      consent: {
-        checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
-        storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      },
-    },
-    {
-      headers: {
-        // HTML caching
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=86400',
-      },
-    }
-  );
 }
 
 /**

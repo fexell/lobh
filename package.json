@@ -12,6 +12,10 @@
     "preview": "netlify serve"
   },
   "prettier": "@shopify/prettier-config",
+  "overrides": {
+    "@remix-run/node": "2.12.0",
+    "@remix-run/react": "2.12.0"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-brands-svg-icons": "^7.1.0",
@@ -23,7 +27,8 @@
     "@netlify/remix-adapter": "^3.0.0",
     "@netlify/remix-edge-adapter": "^3.4.2",
     "@netlify/remix-runtime": "^2.3.1",
-    "@remix-run/react": "^2.12.0",
+    "@remix-run/node": "2.12.0",
+    "@remix-run/react": "2.12.0",
     "@shopify/hydrogen": "^2024.7.4",
     "@shopify/shopify-api": "^12.3.0",
     "@vis.gl/react-google-maps": "^1.7.1",
@@ -40,7 +45,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",
-    "@remix-run/dev": "^2.12.0",
+    "@remix-run/dev": "2.12.0",
     "@remix-run/eslint-config": "^2.12.0",
     "@shopify/cli": "^3.66.1",
     "@shopify/hydrogen-codegen": "^0.3.1",
