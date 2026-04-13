@@ -1,12 +1,38 @@
-[build]
-  command = "npm run build"
-  publish = "dist/client"
+headersOrigin = "config"
+plugins = []
+redirects = []
 
 [dev]
-  command = "npm run dev"
+command = "npm run dev"
 
-# Set immutable caching for static files, because they have fingerprinted filenames
+[functions]
+
+[functions."*"]
+external_node_modules = []
+node_bundler = "esbuild"
+
+[build]
+publish = "D:\\Development\\Projects\\ljudochbildhornan\\lobh1.0\\dist\\client"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm run build"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
 [[headers]]
 for = "/assets/*"
+
 [headers.values]
-"Cache-Control" = "public, max-age=31560000, immutable"
+Cache-Control = "public, max-age=31560000, immutable"
