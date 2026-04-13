@@ -186,7 +186,11 @@ export async function loader(args) {
     }),
   ]);
 
-  console.log("HEADER IN PROD:", JSON.stringify(header, null, 2));
+  console.log("ENV IN PROD:", {
+    checkout: env.PUBLIC_CHECKOUT_DOMAIN,
+    storefrontId: env.PUBLIC_STOREFRONT_ID,
+    token: env.PUBLIC_STOREFRONT_API_TOKEN,
+  });
 
   return json({
     header,
