@@ -1,4 +1,4 @@
-import {Await, Link} from 'react-router-dom';
+import {Await, Link} from '@remix-run/react';
 import {Suspense, useId, useRef, useState, useEffect, createContext, useContext} from 'react';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
@@ -51,7 +51,13 @@ export function PageLayout({
         <CartAside cart={cart} />
         <SearchAside />
         <Aside type="mobile">
-          <MyMobileMenu header={header} publicStoreDomain={publicStoreDomain} primaryDomainUrl={header.shop.primaryDomain.url} />
+          {header && (
+            <MyMobileMenu 
+              header={header} 
+              publicStoreDomain={publicStoreDomain} 
+              primaryDomainUrl={header?.shop?.primaryDomain?.url} 
+            />
+          )}
         </Aside>
         {header && (
           <Suspense fallback={null}>

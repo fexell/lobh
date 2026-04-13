@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist/client"
 
+[[edge_functions]]
+  function = "server"
+  path = "/*"
+
 [dev]
   command = "npm run dev"
 
@@ -17,4 +21,3 @@ for = "/assets/*"
 
 [redirects]
   prepend = "netlify-redirects-prepend.txt"
-  
