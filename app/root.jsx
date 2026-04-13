@@ -263,6 +263,12 @@ function loadDeferredData({context}) {
   };
 }
 
+export const headers = () => {
+  return {
+    'Cache-Control': 'public, max-age=0, s-maxage=60, stale-while-revalidate=86400',
+  };
+};
+
 /**
  * @param {{children?: React.ReactNode}}
  */

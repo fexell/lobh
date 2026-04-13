@@ -677,7 +677,7 @@ function HeaderNavItems({ items, primaryDomainUrl, publicStoreDomain, close, sho
 }
 
 // How many child items before we switch to mega-menu layout
-const MEGA_THRESHOLD = 1;
+const MEGA_THRESHOLD = 3;
 
 // Split an array into N roughly-equal columns
 function chunkIntoColumns(arr, cols) {
