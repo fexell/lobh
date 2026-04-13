@@ -15,16 +15,6 @@ for = "/assets/*"
   node_bundler = "esbuild"
   external_node_modules = []
 
-[[redirects]]
-  from = "/*"
-  to = "https://ljudochbildhornan.se/:splat"
-  status = 301
-  force = true
-  conditions = {Host = ["lobh.se"]}
-
-[[redirects]]
-  from = "/*"
-  to = "https://ljudochbildhornan.se/:splat"
-  status = 301
-  force = true
-  conditions = {Host = ["www.lobh.se"]}
+[redirects]
+  prepend = "netlify-redirects-prepend.txt"
+  
