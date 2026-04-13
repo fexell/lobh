@@ -16,13 +16,8 @@ for = "/assets/*"
   external_node_modules = []
 
 [[redirects]]
-  from = "https://lobh.se/*"
+  from = "/*"
   to = "https://ljudochbildhornan.se/:splat"
   status = 301
   force = true
-
-[[redirects]]
-  from = "https://www.lobh.se/*"
-  to = "https://ljudochbildhornan.se/:splat"
-  status = 301
-  force = true
+  conditions = {Host = ["lobh.se", "www.lobh.se"]}
