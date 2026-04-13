@@ -14,3 +14,15 @@ for = "/assets/*"
 [functions]
   node_bundler = "esbuild"
   external_node_modules = []
+
+[[redirects]]
+  from = "https://lobh.se/*"
+  to = "https://ljudochbildhornan.se/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.lobh.se/*"
+  to = "https://ljudochbildhornan.se/:splat"
+  status = 301
+  force = true
