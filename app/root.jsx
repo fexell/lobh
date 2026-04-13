@@ -186,6 +186,8 @@ export async function loader(args) {
     }),
   ]);
 
+  console.log("HEADER IN PROD:", JSON.stringify(header, null, 2));
+
   return json({
     header,
     cart: cartData,
