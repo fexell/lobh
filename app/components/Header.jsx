@@ -1,5 +1,5 @@
 import {Suspense, useEffect, useId, useRef, useState, createContext, useContext} from 'react';
-import {Await, NavLink, useAsyncValue} from 'react-router-dom';
+import {Await, NavLink, useAsyncValue} from '@remix-run/react';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {Aside, useAside} from '~/components/Aside';
 import {SearchInput} from './SearchInput';
@@ -14,6 +14,8 @@ import TextLogo from '../assets/Logo - Text Only White.svg';
  * @param {HeaderProps}
  */
 export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
+  if(!header) return null;
+
   const {shop, menu} = header;
   const {open} = useAside();
   const [searchOpen, setSearchOpen] = useState(false);

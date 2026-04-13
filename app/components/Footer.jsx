@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router-dom';
+import {Await, NavLink} from '@remix-run/react';
 import {Image} from '@shopify/hydrogen';
 import FreeMapClientLoader from './FreeMapClientLoader';
 import LogoWhite from '../assets/Logo - White.svg';
