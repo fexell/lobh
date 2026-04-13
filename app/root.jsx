@@ -172,27 +172,44 @@ export function links() {
  * @param {LoaderFunctionArgs} args
  */
 export async function loader(args) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
   const {storefront, env} = args.context;
 
-  return defer({
-    ...deferredData,
-    ...criticalData,
-    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-    shop: getShopAnalytics({
-      storefront,
-      publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
-    }),
-    consent: {
-      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
-      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+  // Start fetching non-critical data without blocking TTFB
+  const deferredData = loadDeferredData(args);
+
+  // Critical data with caching
+  const criticalData = await loadCriticalData({
+    ...args,
+    context: {
+      ...args.context,
+      storefront: {
+        ...storefront,
+        cache: storefront.CacheShort(), // <— viktig caching
+      },
     },
   });
+
+  return defer(
+    {
+      ...deferredData,
+      ...criticalData,
+      publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+      shop: getShopAnalytics({
+        storefront,
+        publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
+      }),
+      consent: {
+        checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+        storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+      },
+    },
+    {
+      headers: {
+        // HTML caching
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=86400',
+      },
+    }
+  );
 }
 
 /**
@@ -205,12 +222,12 @@ async function loadCriticalData({context}) {
 
   const [header] = await Promise.all([
     storefront.query(HEADER_QUERY, {
-      cache: storefront.CacheLong(),
+      cache: storefront.CacheShort(), // snabbare, mer responsiv cache
       variables: {
-        headerMenuHandle: 'main-menu', // Adjust to your header menu handle
+        headerMenuHandle: 'main-menu',
       },
     }),
-    // Add other queries here, so that they are loaded in parallel
+    // Lägg till fler kritiska queries här om du har dem
   ]);
 
   return {
@@ -227,19 +244,18 @@ async function loadCriticalData({context}) {
 function loadDeferredData({context}) {
   const {storefront, customerAccount, cart} = context;
 
-  // defer the footer query (below the fold)
   const footer = storefront
     .query(FOOTER_QUERY, {
-      cache: storefront.CacheLong(),
+      cache: storefront.CacheLong(), // bra för statiskt innehåll
       variables: {
-        footerMenuHandle: 'footer', // Adjust to your footer menu handle
+        footerMenuHandle: 'footer',
       },
     })
     .catch((error) => {
-      // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
     });
+
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),

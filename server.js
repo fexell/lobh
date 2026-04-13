@@ -14,11 +14,16 @@ import {createAppLoadContext} from './app/lib/context';
  */
 export default async function (request, netlifyContext) {
   try {
-    const appLoadContext = await createHydrogenAppLoadContext(
-      request,
-      netlifyContext,
-      createAppLoadContext,
-    );
+    const isDev = process.env.NODE_ENV === 'development';
+
+    const appLoadContext = isDev
+      ? await createAppLoadContext(request, process.env, netlifyContext)  // skicka process.env som env
+      : await createHydrogenAppLoadContext(
+          request,
+          netlifyContext,
+          createAppLoadContext,
+        );
+
     const handleRequest = createRequestHandler({
       build: remixBuild,
       mode: process.env.NODE_ENV,
@@ -35,11 +40,6 @@ export default async function (request, netlifyContext) {
     }
 
     if (response.status === 404) {
-      /**
-       * Check for redirects only when there's a 404 from the app.
-       * If the redirect doesn't exist, then `storefrontRedirect`
-       * will pass through the 404 response.
-       */
       return storefrontRedirect({
         request,
         response,
@@ -55,4 +55,3 @@ export default async function (request, netlifyContext) {
 }
 
 /** @typedef {import('@netlify/edge-functions').Context} Context */
-// Kennett 010-1842106

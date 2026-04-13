@@ -1,0 +1,91 @@
+// @ts-ignore -- virtual entry point for the app, resolved by Vite at build time
+import * as remixBuild from 'virtual:remix/server-build';
+import {
+  createHydrogenAppLoadContext,
+  createRequestHandler,
+} from '@netlify/remix-edge-adapter';
+import {storefrontRedirect} from '@shopify/hydrogen';
+import {createAppLoadContext} from './app/lib/context';
+
+/**
+ * @param {Request} request
+ * @param {Context} netlifyContext
+ * @return {Promise<any>}
+ */
+export default async function (request, netlifyContext) {
+  try {
+    // --- DEV FIX: Inject a proper Netlify-like context locally ---
+    let fixedContext = netlifyContext;
+
+    if (process.env.NODE_ENV === 'development') {
+      fixedContext = {
+        ...netlifyContext,
+
+        env: {
+          ...(netlifyContext.env ?? {}),
+          PUBLIC_STORE_DOMAIN: process.env.PUBLIC_STORE_DOMAIN,
+          PUBLIC_STOREFRONT_API_TOKEN: process.env.PUBLIC_STOREFRONT_API_TOKEN,
+          PUBLIC_STOREFRONT_ID: process.env.PUBLIC_STOREFRONT_ID,
+          PUBLIC_CHECKOUT_DOMAIN: process.env.PUBLIC_CHECKOUT_DOMAIN,
+        },
+
+        storefront: netlifyContext.storefront ?? {
+          query: () => {
+            throw new Error('storefront.query called in dev without Netlify context');
+          },
+          CacheShort: () => ({}),
+          CacheLong: () => ({}),
+          cache: () => ({}),
+        },
+
+        cart: netlifyContext.cart ?? {
+          get: () => null,
+        },
+
+        customerAccount: netlifyContext.customerAccount ?? {
+          isLoggedIn: () => false,
+        },
+
+        session: netlifyContext.session ?? {
+          isPending: false,
+          commit: async () => '',
+        },
+      };
+    }
+
+    // Create Hydrogen context using the fixed context
+    const appLoadContext = await createHydrogenAppLoadContext(
+      request,
+      fixedContext,
+      createAppLoadContext,
+    );
+
+    const handleRequest = createRequestHandler({
+      build: remixBuild,
+      mode: process.env.NODE_ENV,
+    });
+
+    const response = await handleRequest(request, appLoadContext);
+
+    if (!response) return;
+
+    if (appLoadContext.session.isPending) {
+      response.headers.set('Set-Cookie', await appLoadContext.session.commit());
+    }
+
+    if (response.status === 404) {
+      return storefrontRedirect({
+        request,
+        response,
+        storefront: appLoadContext.storefront,
+      });
+    }
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    return new Response('An unexpected error occurred', {status: 500});
+  }
+}
+
+/** @typedef {import('@netlify/edge-functions').Context} Context */
