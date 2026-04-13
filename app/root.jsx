@@ -9,7 +9,7 @@ import {
   useRouteLoaderData,
   ScrollRestoration,
   isRouteErrorResponse,
-  NavLink
+  NavLink,
 } from '@remix-run/react';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -20,6 +20,105 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 
 import './lib/fontawesome';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+
+export const meta = () => {
+  const siteUrl = "https://ljudochbildhornan.se";
+  const siteName = "Ljud & Bild Hörnan";
+  const title = "Ljud & Bild Hörnan | Din destination för modern teknik";
+  const description =
+    "Ljud & Bild Hörnan i Katrineholm – din lokala butik för ljud, bild, smart hem och installation. Varumärken som Apple, Samsung, Bosch, Miele, Audio Pro m.fl. Fri frakt över 500 kr.";
+  const ogImage = `${siteUrl}/images/og/OG.png`; // Byt till en riktig OG-bild (1200x630px JPG/PNG)
+  const locale = "sv_SE";
+
+  return [
+    // ─── Grundläggande ───────────────────────────────────────────
+    { charset: "utf-8" },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    { title },
+    { name: "description", content: description },
+    { name: "author", content: siteName },
+    { name: "robots", content: "index, follow" },
+    { name: "language", content: "Swedish" },
+
+    // ─── Canonical ────────────────────────────────────────────────
+    { tagName: "link", rel: "canonical", href: siteUrl },
+
+    // ─── Open Graph (Facebook, LinkedIn, m.fl.) ──────────────────
+    { property: "og:type", content: "website" },
+    { property: "og:site_name", content: siteName },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:url", content: siteUrl },
+    { property: "og:image", content: ogImage },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
+    { property: "og:image:alt", content: `${siteName} logotyp` },
+    { property: "og:locale", content: locale },
+
+    // ─── Twitter / X Cards ───────────────────────────────────────
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: ogImage },
+    { name: "twitter:image:alt", content: `${siteName} logotyp` },
+    // { name: "twitter:site", content: "@dittTwitterHandle" }, // Lägg till om ni har Twitter
+
+    // ─── Geo / lokal SEO ─────────────────────────────────────────
+    { name: "geo.region", content: "SE-D" }, // Södermanlands län
+    { name: "geo.placename", content: "Katrineholm" },
+    { name: "geo.position", content: "58.99435315398727;16.204195497366467" },
+    { name: "ICBM", content: "58.9956, 16.2073" },
+
+    // ─── Tema & PWA ──────────────────────────────────────────────
+    { name: "theme-color", content: "#7AC9EF" }, // Matcha er primärfärg
+    { name: "color-scheme", content: "dark light" },
+    { tagName: "link", rel: "icon", href: "/favicon.ico" },
+    { tagName: "link", rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+
+    {
+      "script:ld+json": {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://ljudochbildhornan.se/#business",
+        name: "Ljud & Bild Hörnan",
+        description:
+          "Lokal butik i Katrineholm för ljud, bild, smart hem och installation.",
+        url: "https://ljudochbildhornan.se",
+        telephone: "+46351911 00",
+        email: "butik@katrineholmhemel.se",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Drottninggatan 8",
+          addressLocality: "Katrineholm",
+          postalCode: "641 30",
+          addressCountry: "SE",
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: 58.99435315398727,
+          longitude: 16.204195497366467,
+        },
+        openingHoursSpecification: [
+          {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            opens: "10:00",
+            closes: "17:00",
+          },
+        ],
+        priceRange: "$$",
+        currenciesAccepted: "SEK",
+        paymentAccepted: "Credit Card, Cash",
+        hasMap: "https://www.google.com/maps/place/LJUD%26BILD-h%C3%B6rnan+(Katrineholms+Hemelektronik+AB)/@58.9943175,16.2040305,20z/data=!4m6!3m5!1s0x465eb79374d6daf5:0x52c3d9d250ad3550!8m2!3d58.9941049!4d16.2040504!16s%2Fg%2F12qgpb0f5?entry=ttu&g_ep=EgoyMDI2MDQwOC4wIKXMDSoASAFQAw%3D%3D",
+        sameAs: [
+          // Lägg till era sociala medier-URLs här om ni har dem:
+          // "https://www.facebook.com/...",
+          // "https://www.instagram.com/...",
+        ],
+      },
+    }
+  ];
+};
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -159,8 +258,6 @@ export function Layout({children}) {
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link rel="stylesheet" href={tailwindCss}></link>
         <Meta />
         <Links />

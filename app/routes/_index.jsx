@@ -82,7 +82,7 @@ const HOMEPAGE_QUERY = `#graphql
 /* ─── Meta ──────────────────────────────────────────────────────────────── */
 
 /** @type {MetaFunction} */
-export const meta = () => [{title: 'Ljud & Bild Hörnan | Home'}];
+/* export const meta = () => [{title: 'Ljud & Bild Hörnan | Home'}]; */
 
 /* ─── Loader ────────────────────────────────────────────────────────────── */
 

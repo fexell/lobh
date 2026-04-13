@@ -11,6 +11,7 @@ export default defineConfig({
     hydrogen(),
     remix({
       presets: [hydrogen.preset()],
+      buildDirectory: 'build',
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
