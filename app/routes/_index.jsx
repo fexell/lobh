@@ -116,15 +116,7 @@ export async function loader(args) {
       console.error(error);
       return null;
     }),
-    storefront.query(SHOP_QUERY, {
-      variables: {
-        country: storefront.i18n.country,
-        language: storefront.i18n.language,
-      },
-    })
   ]);
-
-  console.log("SHOPDATA:", shopData);
 
   // Dina befintliga queries
   const deferredData = loadDeferredData(args);
@@ -138,7 +130,7 @@ export async function loader(args) {
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
 
     // Viktigt: PageLayout behöver shop.shop.primaryDomain.url
-    shop: shopData?.shop,
+    shop: getShopAnalytics({storefront}),
 
     ...deferredData,
     ...criticalData,
