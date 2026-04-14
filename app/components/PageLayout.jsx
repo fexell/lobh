@@ -25,6 +25,8 @@ export function PageLayout({
   isLoggedIn,
   publicStoreDomain,
 }) {
+  if (!header) return null;
+
   const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
