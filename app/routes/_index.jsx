@@ -92,6 +92,10 @@ const SHOP_QUERY = `#graphql
   }
 `;
 
+export function shouldRevalidate() {
+  return false;
+}
+
 /* ─── Meta ──────────────────────────────────────────────────────────────── */
 
 /** @type {MetaFunction} */

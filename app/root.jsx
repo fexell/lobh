@@ -128,11 +128,10 @@ export const shouldRevalidate = ({
   nextUrl,
   defaultShouldRevalidate,
 }) => {
-  // revalidate when a mutation is performed e.g add to cart, login...
   if (formMethod && formMethod !== 'GET') return true;
 
-  // revalidate when manually revalidating via useRevalidator
-  if (currentUrl.toString() === nextUrl.toString()) return true;
+  // Ta bort eller invertera detta villkor — det triggade omloadning på /→/
+  // if (currentUrl.toString() === nextUrl.toString()) return true;
 
   return defaultShouldRevalidate;
 };
