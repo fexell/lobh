@@ -14,7 +14,7 @@ import TextLogo from '../assets/Logo - Text Only White.svg';
  * @param {HeaderProps}
  */
 export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
-  if(!header) return null;
+  if (!header?.shop?.primaryDomain) return null;
 
   const {shop, menu} = header;
   const {open} = useAside();

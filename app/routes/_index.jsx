@@ -109,7 +109,11 @@ export async function loader(args) {
 
   const [header, cartData, isLoggedIn, footer] = await Promise.all([
     storefront.query(HEADER_QUERY, {
-      variables: { headerMenuHandle: 'main-menu' },
+      variables: {
+        headerMenuHandle: 'main-menu',
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
     }),
     cart.get(),
     customerAccount.isLoggedIn(),
