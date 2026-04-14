@@ -145,15 +145,36 @@ export async function loader(args) {
 /* ─────────────────────────────────────────────── */
 
 async function loadCriticalData({context}) {
+  const {storefront} = context;
+
   const [{collections}, {products}, {page}] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTION_QUERY),
-    context.storefront.query(BEST_SELLING_PRODUCT_QUERY),
-    context.storefront.query(HOMEPAGE_QUERY, {variables: {handle: 'Home'}}),
+    storefront.query(FEATURED_COLLECTION_QUERY, {
+      variables: {
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+    }),
+
+    storefront.query(BEST_SELLING_PRODUCT_QUERY, {
+      variables: {
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+    }),
+
+    storefront.query(HOMEPAGE_QUERY, {
+      variables: {
+        handle: 'Home',
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+    }),
   ]);
+
   return {
-    featuredCollection: collections.nodes[0],
-    bestSellingProduct: products.nodes,
-    homepage: page,
+    featuredCollection: collections?.nodes?.[0] ?? null,
+    bestSellingProduct: products?.nodes ?? [],
+    homepage: page ?? null,
   };
 }
 
