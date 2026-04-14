@@ -403,6 +403,16 @@ export type HomePageQuery = {
   >;
 };
 
+export type ShopInfoQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type ShopInfoQuery = {
+  shop: Pick<StorefrontAPI.Shop, 'id' | 'name'> & {
+    primaryDomain: Pick<StorefrontAPI.Domain, 'url'>;
+  };
+};
+
 export type FeaturedCollectionFragment = Pick<
   StorefrontAPI.Collection,
   'id' | 'title' | 'handle'
@@ -1308,6 +1318,10 @@ interface GeneratedQueryTypes {
   '#graphql\n  query HomePage($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    page(handle: $handle) {\n      id\n      title\n      body\n      bodySummary\n    }\n  }\n': {
     return: HomePageQuery;
     variables: HomePageQueryVariables;
+  };
+  '#graphql\n  query ShopInfo {\n    shop {\n      id\n      name\n      primaryDomain {\n        url\n      }\n    }\n  }\n': {
+    return: ShopInfoQuery;
+    variables: ShopInfoQueryVariables;
   };
   '#graphql\n  fragment FeaturedCollection on Collection {\n    id\n    title\n    image {\n      id\n      url\n      altText\n      width\n      height\n    }\n    handle\n  }\n  query FeaturedCollection($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...FeaturedCollection\n      }\n    }\n  }\n': {
     return: FeaturedCollectionQuery;

@@ -32,6 +32,7 @@ export async function loader(args) {
 
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
+  
   return defer({...deferredData, ...criticalData});
 }
 

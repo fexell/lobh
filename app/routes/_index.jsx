@@ -80,6 +80,18 @@ const HOMEPAGE_QUERY = `#graphql
   }
 `;
 
+const SHOP_QUERY = `#graphql
+  query ShopInfo {
+    shop {
+      id
+      name
+      primaryDomain {
+        url
+      }
+    }
+  }
+`;
+
 /* ─── Meta ──────────────────────────────────────────────────────────────── */
 
 /** @type {MetaFunction} */
@@ -89,22 +101,25 @@ const HOMEPAGE_QUERY = `#graphql
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
-  const { storefront, customerAccount, cart, env } = args.context;
+  const {storefront, customerAccount, cart, env} = args.context;
 
-  // Hämta samma data som root-loadern
-  const [header, cartData, isLoggedIn, footer] = await Promise.all([
+  // Hämta samma basdata som root-loadern
+  const [header, cartData, isLoggedIn, footer, shopData] = await Promise.all([
     storefront.query(HEADER_QUERY, {
-      variables: { headerMenuHandle: 'main-menu' },
+      variables: {headerMenuHandle: 'main-menu'},
     }),
     cart.get(),
     customerAccount.isLoggedIn(),
     storefront.query(FOOTER_QUERY, {
-      variables: { footerMenuHandle: 'footer' },
+      variables: {footerMenuHandle: 'footer'},
     }).catch((error) => {
       console.error(error);
       return null;
     }),
+    storefront.query(SHOP_QUERY),
   ]);
+
+  console.log("SHOPDATA:", shopData);
 
   // Dina befintliga queries
   const deferredData = loadDeferredData(args);
@@ -116,26 +131,29 @@ export async function loader(args) {
     isLoggedIn,
     footer,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-    shop: getShopAnalytics({ storefront }),
+
+    // Viktigt: PageLayout behöver shop.shop.primaryDomain.url
+    shop: shopData?.shop,
 
     ...deferredData,
     ...criticalData,
   });
 }
 
-async function loadCriticalData({ context }) {
-  const [{ collections }, { products }, { page }, { shop }] = await Promise.all([
+/* ─────────────────────────────────────────────── */
+/* DINA BEFINTLIGA FUNKTIONER (oförändrade)        */
+/* ─────────────────────────────────────────────── */
+
+async function loadCriticalData({context}) {
+  const [{collections}, {products}, {page}] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
     context.storefront.query(BEST_SELLING_PRODUCT_QUERY),
-    context.storefront.query(HOMEPAGE_QUERY, { variables: { handle: 'Home' } }),
-    context.storefront.query(SHOP_QUERY), // ← lägg till denna
+    context.storefront.query(HOMEPAGE_QUERY, {variables: {handle: 'Home'}}),
   ]);
-
   return {
     featuredCollection: collections.nodes[0],
     bestSellingProduct: products.nodes,
     homepage: page,
-    shop, // ← lägg till denna
   };
 }
 
@@ -942,18 +960,6 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 4, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
-      }
-    }
-  }
-`;
-
-const SHOP_QUERY = `#graphql
-  query ShopInfo {
-    shop {
-      id
-      name
-      primaryDomain {
-        url
       }
     }
   }
