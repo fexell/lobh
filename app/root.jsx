@@ -186,7 +186,7 @@ export async function loader(args) {
     }),
   ]);
 
-  console.log("ENV IN PROD:", {
+  console.log("ENV IN DEV:", {
     checkout: env.PUBLIC_CHECKOUT_DOMAIN,
     storefrontId: env.PUBLIC_STOREFRONT_ID,
     token: env.PUBLIC_STOREFRONT_API_TOKEN,
@@ -200,7 +200,7 @@ export async function loader(args) {
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     shop: getShopAnalytics({
       storefront,
-      publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
+      //publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
     }),
     consent: {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,

@@ -1,10 +1,11 @@
-import {defer} from '@netlify/remix-runtime';
+import {defer, json} from '@netlify/remix-runtime';
 import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
+import {Image, Money, getShopAnalytics} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import { LogoMarquee } from '~/components/LogoMarquee';
 import { useTheme } from '~/components/PageLayout';
+import { HEADER_QUERY, FOOTER_QUERY } from '~/lib/fragments';
 
 import Banner1 from '../assets/banner-4.jpg';
 import ContentImage1 from '../assets/MacBook.jpg';
@@ -88,21 +89,53 @@ const HOMEPAGE_QUERY = `#graphql
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
+  const { storefront, customerAccount, cart, env } = args.context;
+
+  // Hämta samma data som root-loadern
+  const [header, cartData, isLoggedIn, footer] = await Promise.all([
+    storefront.query(HEADER_QUERY, {
+      variables: { headerMenuHandle: 'main-menu' },
+    }),
+    cart.get(),
+    customerAccount.isLoggedIn(),
+    storefront.query(FOOTER_QUERY, {
+      variables: { footerMenuHandle: 'footer' },
+    }).catch((error) => {
+      console.error(error);
+      return null;
+    }),
+  ]);
+
+  // Dina befintliga queries
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return defer({...deferredData, ...criticalData});
+
+  return json({
+    header,
+    cart: cartData,
+    isLoggedIn,
+    footer,
+    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    shop: getShopAnalytics({ storefront }),
+
+    ...deferredData,
+    ...criticalData,
+  });
 }
 
-async function loadCriticalData({context}) {
-  const [{collections}, {products}, {page}] = await Promise.all([
+async function loadCriticalData({ context }) {
+  const [{ collections }, { products }, { page }, { shop }] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
     context.storefront.query(BEST_SELLING_PRODUCT_QUERY),
-    context.storefront.query(HOMEPAGE_QUERY, {variables: {handle: 'Home'}}),
+    context.storefront.query(HOMEPAGE_QUERY, { variables: { handle: 'Home' } }),
+    context.storefront.query(SHOP_QUERY), // ← lägg till denna
   ]);
+
   return {
     featuredCollection: collections.nodes[0],
     bestSellingProduct: products.nodes,
     homepage: page,
+    shop, // ← lägg till denna
   };
 }
 
@@ -909,6 +942,18 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 4, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
+      }
+    }
+  }
+`;
+
+const SHOP_QUERY = `#graphql
+  query ShopInfo {
+    shop {
+      id
+      name
+      primaryDomain {
+        url
       }
     }
   }

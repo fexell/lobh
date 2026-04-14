@@ -522,7 +522,7 @@ export function Header({header, cart, isLoggedIn, publicStoreDomain}) {
             <div className="lc-nav-left">
               <HeaderNavItems
                 items={leftItems}
-                primaryDomainUrl={header.shop.primaryDomain.url}
+                primaryDomainUrl={header?.shop?.primaryDomain?.url}
                 publicStoreDomain={publicStoreDomain}
                 close={() => {}}
                 shopName={shop.name}
