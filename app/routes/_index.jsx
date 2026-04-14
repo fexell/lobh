@@ -105,12 +105,38 @@ export function shouldRevalidate() {
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
+  const { storefront, customerAccount, cart, env } = args.context;
+
+  const [header, cartData, isLoggedIn, footer] = await Promise.all([
+    storefront.query(HEADER_QUERY, {
+      variables: { headerMenuHandle: 'main-menu' },
+    }),
+    cart.get(),
+    customerAccount.isLoggedIn(),
+    storefront.query(FOOTER_QUERY, {
+      variables: { footerMenuHandle: 'footer' },
+    }).catch(() => null),
+  ]);
+
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
 
   return json({
-    ...deferredData,
+    header,
+    cart: cartData,
+    isLoggedIn,
+    footer,
+    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+
+    shop: getShopAnalytics({storefront}),
+
+    consent: {
+      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+    },
+
     ...criticalData,
+    ...deferredData,
   });
 }
 
