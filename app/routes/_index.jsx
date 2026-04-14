@@ -101,42 +101,10 @@ const SHOP_QUERY = `#graphql
 
 /** @param {LoaderFunctionArgs} args */
 export async function loader(args) {
-  const {storefront, customerAccount, cart, env} = args.context;
-
-  // Hämta samma basdata som root-loadern
-  const [header, cartData, isLoggedIn, footer, shopData] = await Promise.all([
-    storefront.query(HEADER_QUERY, {
-      variables: {headerMenuHandle: 'main-menu'},
-    }),
-    cart.get(),
-    customerAccount.isLoggedIn(),
-    storefront.query(FOOTER_QUERY, {
-      variables: {footerMenuHandle: 'footer'},
-    }).catch((error) => {
-      console.error(error);
-      return null;
-    }),
-  ]);
-
-  // Dina befintliga queries
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
 
   return json({
-    header,
-    cart: cartData,
-    isLoggedIn,
-    footer,
-    publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-
-    // Viktigt: PageLayout behöver shop.shop.primaryDomain.url
-    shop: getShopAnalytics({storefront}),
-
-    consent: {
-      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
-      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-    },
-
     ...deferredData,
     ...criticalData,
   });

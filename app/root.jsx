@@ -186,12 +186,6 @@ export async function loader(args) {
     }),
   ]);
 
-  console.log("ENV IN DEV:", {
-    checkout: env.PUBLIC_CHECKOUT_DOMAIN,
-    storefrontId: env.PUBLIC_STOREFRONT_ID,
-    token: env.PUBLIC_STOREFRONT_API_TOKEN,
-  });
-
   return json({
     header,
     cart: cartData,
