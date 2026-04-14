@@ -132,6 +132,11 @@ export async function loader(args) {
     // Viktigt: PageLayout behöver shop.shop.primaryDomain.url
     shop: getShopAnalytics({storefront}),
 
+    consent: {
+      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+      storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+    },
+
     ...deferredData,
     ...criticalData,
   });
