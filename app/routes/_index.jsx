@@ -116,7 +116,12 @@ export async function loader(args) {
       console.error(error);
       return null;
     }),
-    storefront.query(SHOP_QUERY),
+    storefront.query(SHOP_QUERY, {
+      variables: {
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+    })
   ]);
 
   console.log("SHOPDATA:", shopData);
